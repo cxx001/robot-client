@@ -471,7 +471,7 @@ class pdk_15{
 		// 开始匹配
 		let msg = {
 			gameType: consts.GameType.PDK_15,
-			stage: 0//Math.floor(Math.random()*100) % 3
+			stage: Math.floor(Math.random()*100) % 3
 		}
 		await this.pomelo.request('connector.lobbyHandler.startMatch', msg).then((data)=>{
 		})

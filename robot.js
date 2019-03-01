@@ -3,7 +3,7 @@ let logger2 = require('./util/logger').getLogger('mark');
 let sleep = require('./util/utils').sleep ; 
 let Client = require('./views/client');
 
-let RobotNum = 2;
+let RobotNum = 30;
 
 process.on('uncaughtException',
 async function (err) {
@@ -27,7 +27,7 @@ let run = async function(){
     for(let cnt = 0; cnt<RobotNum; cnt ++ ){
         let name = 'robot_' + cnt;
         clients[cnt] = new Client(name,'');
-	}
+    }
 	
 	// let client = new Client('test_1', '');
 }
