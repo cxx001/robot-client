@@ -354,7 +354,6 @@ class pdk_15{
 	};
 
 	async onUserEntryRoom(data){
-		console.log('+++++++++++', this.playerData.id, data);
 		if (this.playerData.id == data.id) {  // && _isRobot(this.playerData.openid)
 			// 进入自动准备
 			await this.pomelo.request('table.tableHandler.readyGame', {}).then((data)=>{
