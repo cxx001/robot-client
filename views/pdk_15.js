@@ -345,6 +345,22 @@ class pdk_15{
 	}
 
 	/* *************************  resv begin  ************************* */
+
+	_isRobot(openid) {
+		if (openid.indexOf("robot_") != -1) {
+			return true;
+		}
+		return false;
+	};
+
+	async onUserEntryRoom(data){
+		console.log('+++++++++++', this.playerData.id, data);
+		if (this.playerData.id == data.id) {  // && _isRobot(this.playerData.openid)
+			// 进入自动准备
+			await this.pomelo.request('table.tableHandler.readyGame', {}).then((data)=>{
+			})
+		}
+	}
 	
 	async onStartGame(data){
 		this.wCurrentUser = data.wCurrentUser;
@@ -411,15 +427,10 @@ class pdk_15{
 		await sleep(10000);
 
 		// 获取游戏厅信息
-		await this.pomelo.request('connector.lobbyHandler.getMatchInfo', {gameType: consts.GameType.PDK_15}).then((data)=>{
+		await this.pomelo.request('connector.matchHandler.getMatchInfo', {gameType: consts.GameType.PDK_15}).then((data)=>{
 		})
 		
-		// 开始匹配
-		let msg = {
-			gameType: consts.GameType.PDK_15,
-			stage: 0//Math.floor(Math.random()*100) % 3
-		}
-		await this.pomelo.request('connector.lobbyHandler.startMatch', msg).then((data)=>{
+		await this.pomelo.request('table.tableHandler.readyGame', {}).then((data)=>{
 		})
 	}
 
@@ -458,6 +469,7 @@ class pdk_15{
 	/* *************************  msg begin  ************************* */
 
     async mainLoop(){
+		this.pomelo.on('onUserEntryRoom',this.onUserEntryRoom.bind(this));
 		this.pomelo.on('onStartGame',this.onStartGame.bind(this));
 		this.pomelo.on('onWarnUser',this.onWarnUser.bind(this));
 		this.pomelo.on('onOutCard',this.onOutCard.bind(this));
@@ -465,15 +477,15 @@ class pdk_15{
 		this.pomelo.on('onSettlement',this.onSettlement.bind(this));
 
 		// 获取游戏厅信息
-		await this.pomelo.request('connector.lobbyHandler.getMatchInfo', {gameType: consts.GameType.PDK_15}).then((data)=>{
+		await this.pomelo.request('connector.matchHandler.getMatchInfo', {gameType: consts.GameType.PDK_15}).then((data)=>{
 		})
 		
-		// 开始匹配
+		// 进入房间
 		let msg = {
 			gameType: consts.GameType.PDK_15,
-			stage: Math.floor(Math.random()*100) % 3
+			stage: 1//Math.floor(Math.random()*100) % 3
 		}
-		await this.pomelo.request('connector.lobbyHandler.startMatch', msg).then((data)=>{
+		await this.pomelo.request('connector.matchHandler.enterGoldRoom', msg).then((data)=>{
 		})
     }
 };
