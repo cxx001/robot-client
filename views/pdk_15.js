@@ -21,6 +21,7 @@ class pdk_15{
         this.client = client ;
         this.pomelo = client.pomelo ;
 		this.playerData = client.playerData;
+		this.stage = client.stage;
 		
 		// 数据
 		this.wChairID = null;
@@ -354,7 +355,7 @@ class pdk_15{
 	};
 
 	async onUserEntryRoom(data){
-		if (this.playerData.id == data.id) {  // && _isRobot(this.playerData.openid)
+		if (this.playerData.id == data.id) {  // && this._isRobot(this.playerData.openid)
 			// 进入自动准备
 			await this.pomelo.request('table.tableHandler.readyGame', {}).then((data)=>{
 			})
@@ -482,8 +483,9 @@ class pdk_15{
 		// 进入房间
 		let msg = {
 			gameType: consts.GameType.PDK_15,
-			stage: 1//Math.floor(Math.random()*100) % 3
+			stage: this.stage
 		}
+		console.log('enterGoldeRoom--->>>>>>>>>>>>>>>',msg)
 		await this.pomelo.request('connector.matchHandler.enterGoldRoom', msg).then((data)=>{
 		})
     }

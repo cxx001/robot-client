@@ -6,12 +6,12 @@ let playerData = require('../dataMgr/playerData');
 let lobby = require('../views/lobby');
 let pdk_15 = require('./pdk_15');
 
-const C_HOST =  '127.0.0.1';
-// const C_HOST =  '47.99.50.101';
+// const C_HOST =  '127.0.0.1';
+const C_HOST =  '47.99.50.101';
 const C_PORT = 3014;
 
 class Client{
-    constructor(openid,pw){
+    constructor(openid,pw,stage){
         this.host = C_HOST;
         this.port = C_PORT;
         this.hostGateway = C_HOST;
@@ -19,7 +19,8 @@ class Client{
         this.code = openid;
         this.openid = openid;
         this.password = pw ;
-        this.gender = 1 ;
+		this.gender = 1 ;
+		this.stage = stage;
         this.mainLoop();
     }
 
