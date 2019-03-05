@@ -347,16 +347,9 @@ class pdk_15{
 
 	/* *************************  resv begin  ************************* */
 
-	_isRobot(openid) {
-		if (openid.indexOf("robot_") != -1) {
-			return true;
-		}
-		return false;
-	};
-
 	async onUserEntryRoom(data){
-		if (this.playerData.id == data.id) {  // && this._isRobot(this.playerData.openid)
-			// 进入自动准备
+		//自己进入房间自动准备
+		if (this.playerData.id == data.id) {
 			await this.pomelo.request('table.tableHandler.readyGame', {}).then((data)=>{
 			})
 		}
@@ -380,7 +373,7 @@ class pdk_15{
 					bCardData: OutCard.bCardData,
 					bCardCount: OutCard.bCardCount
 				}
-				await sleep(2000);
+				await sleep(3000);
 				await this.pomelo.request('table.tableHandler.playCard', msg).then((data)=>{
 				})
 			} else {
@@ -414,7 +407,7 @@ class pdk_15{
 					bCardData: OutCard.bCardData,
 					bCardCount: OutCard.bCardCount
 				}
-				await sleep(2000);
+				await sleep(3000);
 				await this.pomelo.request('table.tableHandler.playCard', msg).then((data)=>{
 				})
 			} else {
@@ -424,12 +417,7 @@ class pdk_15{
 	}
 
 	async onSettlement(data){
-		await sleep(10000);
-
-		// 获取游戏厅信息
-		await this.pomelo.request('connector.matchHandler.getMatchInfo', {gameType: consts.GameType.PDK_15}).then((data)=>{
-		})
-		
+		await sleep(3000);
 		await this.pomelo.request('table.tableHandler.readyGame', {}).then((data)=>{
 		})
 	}
@@ -457,7 +445,7 @@ class pdk_15{
 					bCardData: OutCard.bCardData,
 					bCardCount: OutCard.bCardCount
 				}
-				await sleep(2000);
+				await sleep(3000);
 				await this.pomelo.request('table.tableHandler.playCard', msg).then((data)=>{
 				})
 			} else {
