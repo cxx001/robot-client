@@ -37,7 +37,7 @@ let run = async function(){
 	for(let cnt = RobotNum*2; cnt<RobotNum*3; cnt ++ ){
         let name = 'robot_' + cnt;
         clients[cnt] = new Client(name, '', 2);
-    }
+	}
 	
 	// let client = new Client('test_1', '', 0);
 }
