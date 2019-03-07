@@ -6,8 +6,8 @@ let playerData = require('../dataMgr/playerData');
 let lobby = require('../views/lobby');
 let pdk_15 = require('./pdk_15');
 
-// const C_HOST =  '127.0.0.1';
-const C_HOST =  '47.99.50.101';
+const C_HOST =  '127.0.0.1';
+// const C_HOST =  '47.99.50.101';
 const C_PORT = 3014;
 
 class Client{
