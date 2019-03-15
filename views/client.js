@@ -4,7 +4,7 @@ let pomeloClient = require('../net/pomelo-client');
 let utils = require('../util/utils');
 let playerData = require('../dataMgr/playerData');
 let lobby = require('../views/lobby');
-let pdk_15 = require('./pdk_15');
+let PDK = require('./pdk');
 
 const C_HOST =  '127.0.0.1';
 // const C_HOST =  '47.99.50.101';
@@ -40,14 +40,14 @@ class Client{
         this.pomelo.on('io-error',this.onError.bind(this) );
         await utils.sleep(1000);
 
-        let m = 'pdk_15';
+        let m = 'pdk';
         switch(m){
             case 'lobby':
                 let lobby = new lobby(this);
                 await lobby.mainLoop();
 				break;
-			case 'pdk_15':
-				let pdk = new pdk_15(this);
+			case 'pdk':
+				let pdk = new PDK(this);
 				await pdk.mainLoop();
 				break;
             default:

@@ -19,9 +19,9 @@ module.exports = {
         WECHAT: "wechat",
 	},
 
-	MaxCardCount: 15,      //手牌最大数量
 	AutoDissolveTime: 60,  //自动解散时间
 	InvalUser: 65535, 	   //无效用户
+	PdkStageCount: 3,  	   // 跑得快阶梯数量
 	
 /* *************************  code begin  ************************* */
 
@@ -47,6 +47,7 @@ module.exports = {
         OK: 0,
 		NO_EXIST_ROOM: 1, //房间不存在
 		FULL_PLAYER_ROOM: 2, //房间人数已满
+		GAME_TYPE_INVALID: 3, //游戏类型不存在
 	},
 
 	// 牌桌状态
@@ -74,6 +75,11 @@ module.exports = {
 		Ready_Yes: 1,  		//已经准备
 	},
 
+	AutoState: {
+		AutoNo: 0,    // 没有托管
+		AutoYes: 1,   // 已经托管
+	},
+
 	// 解散状态
 	DissolveState: {
 		Diss_Init: 0,      	//初始状态(或拒绝)
@@ -94,17 +100,19 @@ module.exports = {
 		OK: 0,
 		NO_TURN_OUT_CARD: 1, //没有轮到自己出牌
 		OUT_CARD_TYPE_ERROR: 2, //出牌类型错误
+		REMOVE_CARD_ERROR: 3, //删除出牌错误
 	},
 
-	// 金币场类型
-	GameHallCode: {
+	// 金币场code
+	MatchCode: {
 		OK: 0,
-		HALL_TYPE_FAIL: 1,  // 游戏类型错误
-		STAGE_TYPE_FAIL: 2, // 阶梯类型错误
+		GAEM_TYPE_INVALID: 1,  // 游戏类型不存在
+		EXIST_IN_GAME: 2, 	//已经在游戏中了
 	},
 
 	// 游戏类型
 	GameType: {
 		PDK_15: 1,  // 跑得快15张
+		PDK_16: 2,  // 跑得快16张
 	}
 }

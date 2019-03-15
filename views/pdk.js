@@ -16,7 +16,7 @@ let CT_BOMB_CARD				= 8									//炸弹类型
 
 // 跑得快机器人
 
-class pdk_15{
+class PDK{
     constructor( client ){
         this.client = client ;
         this.pomelo = client.pomelo ;
@@ -465,12 +465,12 @@ class pdk_15{
 		this.pomelo.on('onSettlement',this.onSettlement.bind(this));
 
 		// 获取游戏厅信息
-		await this.pomelo.request('connector.matchHandler.getMatchInfo', {gameType: consts.GameType.PDK_15}).then((data)=>{
+		await this.pomelo.request('connector.matchHandler.getMatchInfo', {gameType: consts.GameType.PDK_16}).then((data)=>{
 		})
 		
 		// 进入房间
 		let msg = {
-			gameType: consts.GameType.PDK_15,
+			gameType: consts.GameType.PDK_16,
 			stage: this.stage
 		}
 		console.log('enterGoldeRoom--->>>>>>>>>>>>>>>',msg)
@@ -479,4 +479,4 @@ class pdk_15{
     }
 };
 
-module.exports = pdk_15 ;
+module.exports = PDK ;
