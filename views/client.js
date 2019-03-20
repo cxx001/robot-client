@@ -11,7 +11,7 @@ const C_HOST =  '127.0.0.1';
 const C_PORT = 3014;
 
 class Client{
-    constructor(openid,pw,stage){
+    constructor(openid,pw,gameType,stage){
         this.host = C_HOST;
         this.port = C_PORT;
         this.hostGateway = C_HOST;
@@ -20,6 +20,7 @@ class Client{
         this.openid = openid;
         this.password = pw ;
 		this.gender = 1 ;
+		this.gameType = gameType;
 		this.stage = stage;
         this.mainLoop();
     }

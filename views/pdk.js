@@ -22,6 +22,7 @@ class PDK{
         this.pomelo = client.pomelo ;
 		this.playerData = client.playerData;
 		this.stage = client.stage;
+		this.gameType = client.gameType;
 		
 		// 数据
 		this.wChairID = null;
@@ -465,12 +466,12 @@ class PDK{
 		this.pomelo.on('onSettlement',this.onSettlement.bind(this));
 
 		// 获取游戏厅信息
-		await this.pomelo.request('connector.matchHandler.getMatchInfo', {gameType: consts.GameType.PDK_16}).then((data)=>{
+		await this.pomelo.request('connector.matchHandler.getMatchInfo', {gameType: this.gameType}).then((data)=>{
 		})
 		
 		// 进入房间
 		let msg = {
-			gameType: consts.GameType.PDK_16,
+			gameType: this.gameType,
 			stage: this.stage
 		}
 		console.log('enterGoldeRoom--->>>>>>>>>>>>>>>',msg)
