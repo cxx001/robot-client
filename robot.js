@@ -25,28 +25,28 @@ async function (err) {
 let run = async function(){
     let clients = [];
     for(let cnt = 0; cnt<RobotNum; cnt ++ ){
-        let name = 'robot_15' + cnt;
+        let name = 'robot_15_' + cnt;
         clients[cnt] = new Client(name, '', 1, 0);
 	}
 	for(let cnt = RobotNum; cnt<RobotNum*2; cnt ++ ){
-        let name = 'robot_15' + cnt;
+        let name = 'robot_15_' + cnt;
         clients[cnt] = new Client(name, '', 1, 1);
 	}
 	for(let cnt = RobotNum*2; cnt<RobotNum*3; cnt ++ ){
-        let name = 'robot_15' + cnt;
+        let name = 'robot_15_' + cnt;
         clients[cnt] = new Client(name, '', 1, 2);
 	}
 
 	for(let cnt = 0; cnt<RobotNum; cnt ++ ){
-        let name = 'robot_16' + cnt;
+        let name = 'robot_16_' + cnt;
         clients[cnt] = new Client(name, '', 2, 0);
 	}
 	for(let cnt = RobotNum; cnt<RobotNum*2; cnt ++ ){
-        let name = 'robot_16' + cnt;
+        let name = 'robot_16_' + cnt;
         clients[cnt] = new Client(name, '', 2, 1);
 	}
 	for(let cnt = RobotNum*2; cnt<RobotNum*3; cnt ++ ){
-        let name = 'robot_16' + cnt;
+        let name = 'robot_16_' + cnt;
         clients[cnt] = new Client(name, '', 2, 2);
 	}
 	
