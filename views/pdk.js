@@ -351,7 +351,11 @@ class PDK{
 	async onUserEntryRoom(data){
 		//自己进入房间自动准备
 		if (this.playerData.id == data.id) {
+			await sleep(1000);
 			await this.pomelo.request('table.tableHandler.readyGame', {}).then((data)=>{
+				if (data.code == consts.ReadyGameCode.COINS_LESS) {
+					this.pomelo.request('table.tableHandler.leaveRoom', {}).then((data)=>{})
+				}
 			})
 		}
 	}
@@ -420,6 +424,9 @@ class PDK{
 	async onSettlement(data){
 		await sleep(5000);
 		await this.pomelo.request('table.tableHandler.readyGame', {}).then((data)=>{
+			if (data.code == consts.ReadyGameCode.COINS_LESS) {
+				this.pomelo.request('table.tableHandler.leaveRoom', {}).then((data)=>{})
+			}
 		})
 	}
 
