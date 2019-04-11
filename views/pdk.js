@@ -374,7 +374,7 @@ class PDK{
 					bCardData: OutCard.bCardData,
 					bCardCount: OutCard.bCardCount
 				}
-				await sleep(3000);
+				await sleep(2000);
 				await this.pomelo.request('table.tableHandler.playCard', msg).then((data)=>{
 				})
 			} else {
@@ -408,7 +408,7 @@ class PDK{
 					bCardData: OutCard.bCardData,
 					bCardCount: OutCard.bCardCount
 				}
-				await sleep(3000);
+				await sleep(2000);
 				await this.pomelo.request('table.tableHandler.playCard', msg).then((data)=>{
 				})
 			} else {
@@ -418,7 +418,7 @@ class PDK{
 	}
 
 	async onSettlement(data){
-		await sleep(3000);
+		await sleep(5000);
 		await this.pomelo.request('table.tableHandler.readyGame', {}).then((data)=>{
 		})
 	}
@@ -446,7 +446,7 @@ class PDK{
 					bCardData: OutCard.bCardData,
 					bCardCount: OutCard.bCardCount
 				}
-				await sleep(3000);
+				await sleep(2000);
 				await this.pomelo.request('table.tableHandler.playCard', msg).then((data)=>{
 				})
 			} else {
