@@ -216,7 +216,7 @@ class PomeloClient extends EventEmitter{
     };
     _sendMessage(reqId, route, msg) {
 
-        logger.debug("@@@send:",route, JSON.stringify(msg) ); 
+        logger.debug(this.code,"@@@send:",route, JSON.stringify(msg) ); 
 
         var type = reqId ? Message.TYPE_REQUEST : Message.TYPE_NOTIFY;
         //compress message by protobuf
@@ -317,12 +317,12 @@ class PomeloClient extends EventEmitter{
     _processMessage  ( msg) {
         if (!msg || !msg.id) {
             // server push message
-            logger.debug("x~~push_msg:",msg.route,msg.body ) ;//, JSON.stringify(msg.body)); 
+            logger.debug(this.code, "x~~push_msg:",msg.route,msg.body ) ;//, JSON.stringify(msg.body)); 
             this.emit(msg.route, msg.body);
             return;
         }
 
-        logger.debug("--resp_msg:", this.routeMap[msg.id], JSON.stringify(msg.route),JSON.stringify(msg.body) );  
+        logger.debug(this.code, "--resp_msg:", this.routeMap[msg.id], JSON.stringify(msg.route),JSON.stringify(msg.body) );  
 
         //if have a id then find the callback function with the request
         var cb = this.callbacks[msg.id];
