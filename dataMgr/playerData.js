@@ -24,7 +24,8 @@ class PlayerData{
         this.openid = info.openid;
         this.coins = info.coins;
         this.gems = info.gems;
-        this.roomid = info.roomid;
+		this.roomid = info.roomid;
+		this.chairID = 0;
 
         if (this.bInited)
             return;
@@ -43,6 +44,7 @@ class PlayerData{
     }
 
     updateProp (data) {
+		console.log('玩家信息:', data);
         for (let prop in data) {
             this[prop] = data[prop];
             //eventMgr.emit(eventMgr.events.EventAvtPropUpdate, prop, data[prop]);

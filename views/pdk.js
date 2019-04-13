@@ -351,10 +351,21 @@ class PDK{
 	async onUserEntryRoom(data){
 		//自己进入房间自动准备
 		if (this.playerData.id == data.id) {
-			await sleep(1000);
+			this.playerData.chairID = data.chairID;
+			let lower = 1000;
+			let upper = 5000;
+			await sleep(Math.floor(Math.random() * (upper - lower)) + lower);
 			await this.pomelo.request('table.tableHandler.readyGame', {}).then((data)=>{
 				if (data.code == consts.ReadyGameCode.COINS_LESS) {
-					this.pomelo.request('table.tableHandler.leaveRoom', {}).then((data)=>{})
+					this.pomelo.request('table.tableHandler.leaveRoom', {}).then((data)=>{
+						if (data.code == consts.LeaveRoomCode.OK) {
+							let msg = {
+								gameType: this.gameType,
+								stage: this.stage
+							}
+							this.pomelo.request('connector.matchHandler.enterGoldRoom', msg).then((data)=>{})
+						}
+					})
 				}
 			})
 		}
@@ -378,7 +389,9 @@ class PDK{
 					bCardData: OutCard.bCardData,
 					bCardCount: OutCard.bCardCount
 				}
-				await sleep(2000);
+				let lower = 2000;
+				let upper = 4000;
+				await sleep(Math.floor(Math.random() * (upper - lower)) + lower);
 				await this.pomelo.request('table.tableHandler.playCard', msg).then((data)=>{
 				})
 			} else {
@@ -412,20 +425,32 @@ class PDK{
 					bCardData: OutCard.bCardData,
 					bCardCount: OutCard.bCardCount
 				}
-				await sleep(2000);
+				let lower = 2000;
+				let upper = 4000;
+				await sleep(Math.floor(Math.random() * (upper - lower)) + lower);
 				await this.pomelo.request('table.tableHandler.playCard', msg).then((data)=>{
 				})
 			} else {
-				logger.info("pass[%s]", this.wChairID);
+				logger.info("要不起[%s]", this.wChairID);
 			}
 		}
 	}
 
 	async onSettlement(data){
-		await sleep(5000);
+		let lower = 2000;
+		let upper = 6000;
+		await sleep(Math.floor(Math.random() * (upper - lower)) + lower);
 		await this.pomelo.request('table.tableHandler.readyGame', {}).then((data)=>{
 			if (data.code == consts.ReadyGameCode.COINS_LESS) {
-				this.pomelo.request('table.tableHandler.leaveRoom', {}).then((data)=>{})
+				this.pomelo.request('table.tableHandler.leaveRoom', {}).then((data)=>{
+					if (data.code == consts.LeaveRoomCode.OK) {
+						let msg = {
+							gameType: this.gameType,
+							stage: this.stage
+						}
+						this.pomelo.request('connector.matchHandler.enterGoldRoom', msg).then((data)=>{})
+					}
+				})
 			}
 		})
 	}
@@ -434,6 +459,18 @@ class PDK{
 		if (data.wWarnUser==(this.wChairID+1)%3)
 		{
 			this.bNextWarn = true;
+		}
+	}
+
+	async onLeaveRoom(data){
+		if (data.wChairID == this.playerData.chairID) {
+			await sleep(5000);
+			let msg = {
+				gameType: this.gameType,
+				stage: this.stage
+			}
+			await this.pomelo.request('connector.matchHandler.enterGoldRoom', msg).then((data)=>{
+			})
 		}
 	}
 
@@ -453,11 +490,13 @@ class PDK{
 					bCardData: OutCard.bCardData,
 					bCardCount: OutCard.bCardCount
 				}
-				await sleep(2000);
+				let lower = 2000;
+				let upper = 4000;
+				await sleep(Math.floor(Math.random() * (upper - lower)) + lower);
 				await this.pomelo.request('table.tableHandler.playCard', msg).then((data)=>{
 				})
 			} else {
-				logger.info("pass[%s]", this.wChairID);
+				logger.info("要不起[%s]", this.wChairID);
 			}
 		}
 	}
@@ -471,17 +510,13 @@ class PDK{
 		this.pomelo.on('onOutCard',this.onOutCard.bind(this));
 		this.pomelo.on('onPassCard',this.onPassCard.bind(this));
 		this.pomelo.on('onSettlement',this.onSettlement.bind(this));
+		this.pomelo.on('onLeaveRoom',this.onLeaveRoom.bind(this));
 
-		// 获取游戏厅信息
-		await this.pomelo.request('connector.matchHandler.getMatchInfo', {gameType: this.gameType}).then((data)=>{
-		})
-		
 		// 进入房间
 		let msg = {
 			gameType: this.gameType,
 			stage: this.stage
 		}
-		console.log('enterGoldeRoom--->>>>>>>>>>>>>>>',msg)
 		await this.pomelo.request('connector.matchHandler.enterGoldRoom', msg).then((data)=>{
 		})
     }
