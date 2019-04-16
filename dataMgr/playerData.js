@@ -5,28 +5,34 @@ class PlayerData{
         this.userInfo = null;
         this.logined = false; 
     }
-    get name() {
-        return this.userInfo.nickName;
-    }
-    get gender() {
-        return this.userInfo.gender;
-    }
-    get avatarUrl() {
-        return this.userInfo.avatarUrl;
-    }
+    // get name() {
+    //     return this.userInfo.nickName;
+    // }
+    // get gender() {
+    //     return this.userInfo.gender;
+    // }
+    // get avatarUrl() {
+    //     return this.userInfo.avatarUrl;
+    // }
 
     // 登录时初始化
     init (pomelo, info) {
         this.pomelo = pomelo ;
-        this.logined = true;
-
-        this.id = info.id;
-        this.openid = info.openid;
-        this.coins = info.coins;
-        this.gems = info.gems;
-		this.roomid = info.roomid;
+		this.logined = true;
 		this.chairID = 0;
 
+		this.openid = info.openid;
+		this.uid = info.uid;
+		this.id = info.id;
+		this.name = info.name;
+		this.gender = info.gender;
+		this.avatarUrl = info.avatarUrl;
+		this.coins = info.coins;
+		this.offlineCoins = info.offlineCoins;
+        this.gems = info.gems;
+		this.roomid = info.roomid;
+		this.goldRoomId = info.goldRoomId;
+		
         if (this.bInited)
             return;
         this.bInited = true;

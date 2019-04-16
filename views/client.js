@@ -62,7 +62,7 @@ class Client{
 
     async onClose(event){       
         logger.error(this.code,'onClose', event.data);   
-        await utils.sleep(10*1000); 
+        await utils.sleep(3*1000); 
         process.nextTick( this.mainLoop.bind(this) );
     }
 
@@ -127,7 +127,7 @@ class Client{
             if( ok ){
                 break;
             }else{
-                await utils.sleep(10000);
+                await utils.sleep(3*1000);
             }
         }
     }

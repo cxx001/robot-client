@@ -50,7 +50,7 @@ let run = async function(){
         clients[cnt] = new Client(name, '', 2, 2);
 	}
 	
-	// let client = new Client('test_1', '', 2, 2);
+	// let client = new Client('test_1', '', 1, 0);
 }
 
 run();
