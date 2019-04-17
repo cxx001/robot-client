@@ -516,21 +516,23 @@ class PDK{
 					}
 					this.pomelo.request('connector.matchHandler.enterGoldRoom', msg).then((resp)=>{})
 				} else {
-					let cardInfo = data.roomInfo.cardInfo;
-					this.wCurrentUser = cardInfo.currentUser;
-					this.cbCardData = cardInfo.handCardData;
-					this.wChairID = self.GetChairIDByUid(this.playerData.id, data.roomInfo.players);
-					this.bNextWarn = cardInfo.bUserWarn[(this.wChairID+1)%3];
-					if (cardInfo.turnUser == this.wCurrentUser) {
-						this.turnCardData = [];
-						this.turnCardCount = 0;
-					} else{
-						this.turnCardData = cardInfo.turnCardData;
-						this.turnCardCount = cardInfo.turnCardCount;
-					}
+					if (data.roomInfo.status == consts.TableStatus.START) {
+						let cardInfo = data.roomInfo.cardInfo;
+						this.wCurrentUser = cardInfo.currentUser;
+						this.cbCardData = cardInfo.handCardData;
+						this.wChairID = self.GetChairIDByUid(this.playerData.id, data.roomInfo.players);
+						this.bNextWarn = cardInfo.bUserWarn[(this.wChairID+1)%3];
+						if (cardInfo.turnUser == this.wCurrentUser) {
+							this.turnCardData = [];
+							this.turnCardCount = 0;
+						} else{
+							this.turnCardData = cardInfo.turnCardData;
+							this.turnCardCount = cardInfo.turnCardCount;
+						}
 
-					self.PlayOutCard(1000, 1500);
-					this.pomelo.request('table.tableHandler.autoCard', {bAuto: 0}).then((resp)=>{})
+						self.PlayOutCard(1000, 1500);
+						this.pomelo.request('table.tableHandler.autoCard', {bAuto: 0}).then((resp)=>{})
+					}
 				}
 			})
 		} else {
