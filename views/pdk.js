@@ -413,6 +413,11 @@ class PDK{
 	}
 
 	async onOutCard(data){
+		if (!this.cbCardData) {
+			logger.warn('[%d] maybe is reconnect. and onOutCard is fronted.', this.wChairID);
+			return;
+		}
+
 		// 删除扑克
 		if (data.outcardUser == this.wChairID) {
 			if(pdkHelper.RemoveCard(data.cardData,data.cardCount,this.cbCardData,this.bCardCount) == false)
@@ -493,6 +498,10 @@ class PDK{
 		this.pomelo.on('onPassCard',this.onPassCard.bind(this));
 		this.pomelo.on('onSettlement',this.onSettlement.bind(this));
 		this.pomelo.on('onLeaveRoom',this.onLeaveRoom.bind(this));
+
+		await this.pomelo.request('connector.matchHandler.getMatchInfo', {gameType: this.gameType}).then((data)=>{});
+		await sleep(1000);
+
 		let self = this;
 		let goldRoomId = this.playerData.goldRoomId;
 		if (goldRoomId != '0') {
