@@ -23,6 +23,7 @@ class PDK{
 		this.playerData = client.playerData;
 		this.stage = client.stage;
 		this.gameType = client.gameType;
+		this.schedule = null;
 		
 		// 数据
 		this.wChairID = null;
@@ -376,10 +377,41 @@ class PDK{
 		}
 	};
 
+	LeaveRoomAndEnter() {
+		this.StopSchedule();
+		this.pomelo.request('table.tableHandler.leaveRoom', {}).then((data)=>{
+			if (data.code == consts.LeaveRoomCode.OK) {
+				let msg = {
+					gameType: this.gameType,
+					stage: this.stage
+				}
+				this.pomelo.request('connector.matchHandler.enterGoldRoom', msg).then((data)=>{})
+			}
+		})
+	};
+
+	StartSchedule() {
+		this.StopSchedule();
+		let lower = 1000 * 10;
+		let upper = 1000 * 20;
+		let dt = Math.floor(Math.random() * (upper - lower)) + lower;
+		this.schedule = setTimeout(function () {
+			this.LeaveRoomAndEnter();
+		}.bind(this), dt);
+	};
+
+	StopSchedule() {
+		if (this.schedule) {
+			clearTimeout(this.schedule);
+			this.schedule = null;
+		}
+	};
+
 	/* *************************  resv begin  ************************* */
 
 	async onUserEntryRoom(data){
 		//自己进入房间自动准备
+		let self = this;
 		if (this.playerData.id == data.id) {
 			this.playerData.chairID = data.chairID;
 			let lower = 1000;
@@ -387,21 +419,15 @@ class PDK{
 			await sleep(Math.floor(Math.random() * (upper - lower)) + lower);
 			await this.pomelo.request('table.tableHandler.readyGame', {}).then((data)=>{
 				if (data.code == consts.ReadyGameCode.COINS_LESS) {
-					this.pomelo.request('table.tableHandler.leaveRoom', {}).then((data)=>{
-						if (data.code == consts.LeaveRoomCode.OK) {
-							let msg = {
-								gameType: this.gameType,
-								stage: this.stage
-							}
-							this.pomelo.request('connector.matchHandler.enterGoldRoom', msg).then((data)=>{})
-						}
-					})
+					self.LeaveRoomAndEnter();
 				}
 			})
+			await this.StartSchedule();
 		}
 	}
 	
 	async onStartGame(data){
+		this.StopSchedule();
 		this.wCurrentUser = data.wCurrentUser;
 		this.cbCardData = data.cbCardData;
 		this.bCardCount = this.cbCardData.length
@@ -439,22 +465,16 @@ class PDK{
 	}
 
 	async onSettlement(data){
+		let self = this;
 		let lower = 2000;
 		let upper = 6000;
 		await sleep(Math.floor(Math.random() * (upper - lower)) + lower);
 		await this.pomelo.request('table.tableHandler.readyGame', {}).then((data)=>{
 			if (data.code == consts.ReadyGameCode.COINS_LESS) {
-				this.pomelo.request('table.tableHandler.leaveRoom', {}).then((data)=>{
-					if (data.code == consts.LeaveRoomCode.OK) {
-						let msg = {
-							gameType: this.gameType,
-							stage: this.stage
-						}
-						this.pomelo.request('connector.matchHandler.enterGoldRoom', msg).then((data)=>{})
-					}
-				})
+				self.LeaveRoomAndEnter();
 			}
 		})
+		await this.StartSchedule();
 	}
 
 	async onWarnUser(data){
