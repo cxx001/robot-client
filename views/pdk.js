@@ -402,8 +402,8 @@ class PDK{
 		let self = this;
 		if (this.playerData.id == data.id) {
 			this.playerData.chairID = data.chairID;
-			let lower = 1000;
-			let upper = 3000;
+			let lower = 2000;
+			let upper = 4000;
 			await sleep(Math.floor(Math.random() * (upper - lower)) + lower);
 			await this.pomelo.request('table.tableHandler.readyGame', {}).then((data)=>{
 				if (data.code != consts.ReadyGameCode.OK) {
