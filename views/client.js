@@ -136,7 +136,7 @@ class Client{
         return {
             name:this.openid,
             gender:this.gender,
-            avatarUrl:''
+            avatarUrl:'http://47.99.50.101:10000/avatar_1.png'
         };
     }
 
