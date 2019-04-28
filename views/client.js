@@ -5,20 +5,21 @@ let utils = require('../util/utils');
 let playerData = require('../dataMgr/playerData');
 let lobby = require('../views/lobby');
 let PDK = require('./pdk');
+let names = require('./names');
 
 const C_HOST =  '127.0.0.1';
 // const C_HOST =  '47.99.50.101';
 const C_PORT = 3014;
 
 class Client{
-    constructor(openid,pw,gameType,stage){
+    constructor(openid,index,gameType,stage){
         this.host = C_HOST;
         this.port = C_PORT;
         this.hostGateway = C_HOST;
         this.portGateway = C_PORT;        
         this.code = openid;
         this.openid = openid;
-        this.password = pw ;
+        this.index = index ;
 		this.gender = 1 ;
 		this.gameType = gameType;
 		this.stage = stage;
@@ -133,10 +134,16 @@ class Client{
     }
 
     _getLoginUserInfo(){
+		if (this.index) {
+			var headname = 'http://47.99.50.101:9999/' + 'head/avatar_' + this.index + '.png';
+		} else {
+			var headname = '';
+		}
+		
         return {
-            name:this.openid,
+            name:names[this.index] || this.openid,
             gender:this.gender,
-            avatarUrl:'http://47.99.50.101:10000/avatar_1.png'
+            avatarUrl:headname
         };
     }
 
