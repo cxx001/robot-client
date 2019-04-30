@@ -427,7 +427,7 @@ class PDK{
 		this.turnCardCount = 0;
 		this.turnCardData = [];
 		this.bNextWarn = false;
-		this.PlayOutCard();
+		this.PlayOutCard(3000, 5000);
 	}
 
 	async onOutCard(data){
