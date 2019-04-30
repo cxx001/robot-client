@@ -162,11 +162,23 @@ class PDK{
 						{
 							IScanOut = false;
 						}
-						else if(pdkHelper.GetCardLogicValue(OutCardResult.cbResultCard[0])!=bombVlue)///炸弹不能拆
+						else //if(pdkHelper.GetCardLogicValue(OutCardResult.cbResultCard[0])!=bombVlue)
 						{
-							OutCard.bCardData = OutCardResult.cbResultCard.slice(0);
-							OutCard.bCardCount = OutCardResult.cbCardCount;
-							IScanOut = true;
+							//炸弹不能拆
+							let isBomb = false;
+							let outvalue = pdkHelper.GetCardLogicValue(OutCardResult.cbResultCard[0]);
+							for (let i = 0; i < AnalyseResult.cbFourCount; i+=4) {
+								let value = pdkHelper.GetCardLogicValue(AnalyseResult.cbFourCardData[i]);
+								if (outvalue == value) {
+									isBomb = true;
+								}
+							}
+
+							if (!isBomb) {
+								OutCard.bCardData = OutCardResult.cbResultCard.slice(0);
+								OutCard.bCardCount = OutCardResult.cbCardCount;
+								IScanOut = true;
+							}
 						}
 					}
 				}
@@ -218,7 +230,14 @@ class PDK{
 					OutCard.bCardData = OutCard.bCardData.slice(0, 2);
 					wSameCardNum = 2;
 				}
-				OutCard.bCardCount = wSameCardNum;
+
+				// 首回合不出炸弹
+				if (wSameCardNum == 4 && AnalyseResult.cbSignedCount > 0) {
+					OutCard.bCardData = [AnalyseResult.cbSignedCardData[AnalyseResult.cbSignedCount-1]];
+					OutCard.bCardCount = 1;
+				} else{
+					OutCard.bCardCount = wSameCardNum;
+				}
 			}
 			//下家报警，单牌出最大
 			if (this.bNextWarn==true&&wSameCardNum==1)
