@@ -134,7 +134,7 @@ class Client{
     }
 
     _getLoginUserInfo(){
-		if (this.index) {
+		if (typeof this.index == 'number') {
 			var headname = 'http://47.99.50.101:9999/' + 'head/avatar_' + this.index + '.png';
 		} else {
 			var headname = '';
