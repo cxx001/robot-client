@@ -42,7 +42,7 @@ class Client{
         this.pomelo.on('io-error',this.onError.bind(this) );
         await utils.sleep(1000);
 
-        let m = 'pdk';
+        let m = 'xx';
         switch(m){
             case 'lobby':
                 let lobby = new lobby(this);
@@ -51,10 +51,7 @@ class Client{
 			case 'pdk':
 				let pdk = new PDK(this);
 				await pdk.mainLoop();
-				break;
-            default:
-                logger.error('m:',m);
-                break;                                              
+				break;                                            
         }
 
         //await utils.sleep(10000);
