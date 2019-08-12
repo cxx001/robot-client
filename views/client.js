@@ -42,7 +42,7 @@ class Client{
         this.pomelo.on('io-error',this.onError.bind(this) );
         await utils.sleep(1000);
 
-        let m = 'xx';
+        let m = 'pdk';
         switch(m){
             case 'lobby':
                 let lobby = new lobby(this);
