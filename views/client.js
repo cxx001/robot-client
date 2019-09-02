@@ -3,26 +3,24 @@ let logger = require('../util/logger').getLogger();
 let pomeloClient = require('../net/pomelo-client');
 let utils = require('../util/utils');
 let playerData = require('../dataMgr/playerData');
-let lobby = require('../views/lobby');
-let PDK = require('./pdk');
 let names = require('./names');
+
+let Lobby = require('../views/lobby');
+let PDK = require('./pdk');
+let Test = require('./test');
 
 const C_HOST =  '127.0.0.1';
 // const C_HOST =  '47.99.50.101';
-const C_PORT = 3014;
+const C_PORT = 8686;
 
 class Client{
-    constructor(openid,index,gameType,stage){
+    constructor(openid){
         this.host = C_HOST;
         this.port = C_PORT;
         this.hostGateway = C_HOST;
         this.portGateway = C_PORT;        
         this.code = openid;
         this.openid = openid;
-        this.index = index ;
-		this.gender = 1 ;
-		this.gameType = gameType;
-		this.stage = stage;
         this.mainLoop();
     }
 
@@ -42,10 +40,14 @@ class Client{
         this.pomelo.on('io-error',this.onError.bind(this) );
         await utils.sleep(1000);
 
-        let m = 'pdk';
+        let m = 'test';
         switch(m){
+            case 'test':
+                let test = new Test(this);
+                await test.mainLoop();
+                break;
             case 'lobby':
-                let lobby = new lobby(this);
+                let lobby = new Lobby(this);
                 await lobby.mainLoop();
 				break;
 			case 'pdk':
@@ -59,9 +61,9 @@ class Client{
     }
 
     async onClose(event){       
-        logger.error(this.code,'onClose', event.data);   
-        await utils.sleep(3*1000); 
-        process.nextTick( this.mainLoop.bind(this) );
+        // logger.error(this.code,'onClose', event.data);   
+        // await utils.sleep(3*1000); 
+        // process.nextTick( this.mainLoop.bind(this) );
     }
 
     onError(event){
@@ -131,17 +133,23 @@ class Client{
     }
 
     _getLoginUserInfo(){
-		if (typeof this.index == 'number') {
-			var headname = 'http://47.99.50.101:9999/' + 'head/avatar_' + this.index + '.png';
-		} else {
-			var headname = '';
-		}
+		// if (typeof this.index == 'number') {
+		// 	var headname = 'http://47.99.50.101:9999/' + 'head/avatar_' + this.index + '.png';
+		// } else {
+		// 	var headname = '';
+		// }
 		
+        // return {
+        //     name:names[this.index] || this.openid,
+        //     gender:this.gender,
+        //     avatarUrl:headname
+        // };
+
         return {
-            name:names[this.index] || this.openid,
-            gender:this.gender,
-            avatarUrl:headname
-        };
+            name: this.code,
+            gender: 1,
+            avatarUrl: ""
+        }
     }
 
     _onLoginFailed(){

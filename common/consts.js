@@ -1,17 +1,15 @@
 /**
- * Date: 2019/2/11
+ * Date: 2019/8/29
  * Author: admin
  * Description: 常量文件
  */
 module.exports = {
-	APP_ID: "wx6e08467553158527",
-    APP_SECRET: "4c5ce70f86af49bd8eba1901ff1adc62",
+	INVALID_CHAIR: 65535, 	   //无效用户
 
-	ENABLE_GM: true,
-	
-	// entity state
-    ENTITY_STATE_INITED: 1,
-	ENTITY_STATE_DESTROYED: 2,
+	Code: {
+        OK: 0,
+        FAIL: 1
+	},
 	
 	// 平台
     Platform: {
@@ -19,67 +17,60 @@ module.exports = {
         WECHAT: "wechat",
 	},
 
-	AutoDissolveTime: 60,  //自动解散时间
-	InvalUser: 65535, 	   //无效用户
-	Pdk15StageCount: 3,    // 跑得快15阶梯数量
-	Pdk16StageCount: 3,    // 跑得快16阶梯数量
-	
-/* *************************  code begin  ************************* */
-
-    Code: {
-        OK: 0,
-        FAIL: 1
-    },
-
-    Login: {
+	Login: {
         OK: 200,  		// 成功
         RELAY: 201,     // 重新登入
         MAINTAIN: 202,  // 维护
         FAIL: 500       // 失败
-    },
+	},
 
-    CheckInResult: {
+	CheckInResult: {
         SUCCESS: 0,  		// 成功
         ALREADY_ONLINE: 1,  // 已经在线
 	},
 
-	// 创房,加房
-    RoomCode: {
+	ServerAdrCode: {
+		OK: 0,
+		GAME_SERVER_NO_OPEN: 1, //游戏服未开启
+		GAME_SERVER_NO_EXIST: 2, //游戏服不存在
+	},
+
+	GameStatus: {
+		GAME_FREE: 0,  //没在游戏中
+		GAME_PLAYING: 1, //游戏中
+	},
+
+	EnterTableCode: {
         OK: 0,
 		NO_EXIST_ROOM: 1, //房间不存在
 		FULL_PLAYER_ROOM: 2, //房间人数已满
-		GAME_TYPE_INVALID: 3, //游戏类型不存在
+		GAME_MAINTAIN: 3, //游戏维护中
+		GAME_RELAY: 4, //不在同一个游戏服进程，告诉客户端重连
+		OTHER_FAIL: 5, // 其它错误
 	},
 
-	// 牌桌状态
     TableStatus: {
-		INIT: 0,    //创建牌桌,准备界面
-		START: 1,   //游戏开始
+		FREE: 0,    //初始化
+		READY: 1, 	//准备界面
+		START: 2,   //游戏开始
 	},
-	
-	// 离开房间
+
+	ReadyGameCode: {
+		OK: 0,
+		GAME_STARTED: 1,    //游戏已经开始  
+		GAME_END: 2,        //游戏结束
+	},
+
 	LeaveRoomCode: {
 		OK: 0,
 		NO_EXIST_ROOM: 1,   //房间不存在
 		START_GAME_NO_LEAVE: 2, //游戏已经开始不能离开牌桌
-		LEAVE_ROOM_DISSOLVE: 3, //房间只有一个人离开,房间解散
-	},
-
-	// 准备
-	ReadyGameCode: {
-		OK: 0,
-		GAME_STARTED: 1,    //游戏已经开始  
-		COINS_LESS: 2,      //玩家金币不足
+		LEAVE_ROOM_DISSOLVE: 3, //房间解散
 	},
 
 	ReadyState: {
 		Ready_No: 0,    	//没有准备
 		Ready_Yes: 1,  		//已经准备
-	},
-
-	AutoState: {
-		AutoNo: 0,    // 没有托管
-		AutoYes: 1,   // 已经托管
 	},
 
 	// 解散状态
@@ -94,28 +85,24 @@ module.exports = {
 	// 解散游戏code
 	DissolveCode: {
 		OK: 0,
-		FAIL: 1,   // 客户端数据异常
-		GAME_NO_START: 2,   //游戏没有开始没有解散操作
+		GAME_NO_START: 1,   //游戏没有开始没有解散操作
 	},
 
 	PlayCardCode: {
 		OK: 0,
 		NO_TURN_OUT_CARD: 1, //没有轮到自己出牌
 		OUT_CARD_TYPE_ERROR: 2, //出牌类型错误
-		REMOVE_CARD_ERROR: 3, //删除出牌错误
 	},
 
-	// 金币场code
-	MatchCode: {
+	// 俱乐部code
+	ClubCode: {
 		OK: 0,
-		GAEM_TYPE_INVALID: 1,  // 游戏类型不存在
-		EXIST_IN_GAME: 2, 	//已经在游戏中了
-		STAGE_COINS_LOW: 3, //阶梯金币数量不满足
+		CLUB_NAME_ERROR: 1,   //名字不合法
+		CLUB_NO_EXIST: 2, 	//俱乐部不存在
+		CLUB_ID_ERROR: 3,	//俱乐部ID错误
+		CLUB_SET_PLAYWAY_TYPE_ERROR: 4, //设置玩法类型错误
+		CLUB_ALREADY_APPLY: 5,   //已经申请
+		CLUB_MEMBER_NOIN_APPLY_LIST: 6,  //成员不在申请列表
+		CLUB_PLAYWAY_NO_EXIST: 7,  //俱乐部玩法不存在
 	},
-
-	// 游戏类型
-	GameType: {
-		PDK_15: 1,  // 跑得快15张
-		PDK_16: 2,  // 跑得快16张
-	}
 }

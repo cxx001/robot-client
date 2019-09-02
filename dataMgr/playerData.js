@@ -18,20 +18,15 @@ class PlayerData{
     // 登录时初始化
     init (pomelo, info) {
         this.pomelo = pomelo ;
-		this.logined = true;
-		this.chairID = 0;
-
+        this.logined = true;
+        
 		this.openid = info.openid;
 		this.uid = info.uid;
-		this.id = info.id;
 		this.name = info.name;
 		this.gender = info.gender;
 		this.avatarUrl = info.avatarUrl;
 		this.coins = info.coins;
-		this.offlineCoins = info.offlineCoins;
         this.gems = info.gems;
-		this.roomid = info.roomid;
-		this.goldRoomId = info.goldRoomId;
 		
         if (this.bInited)
             return;
