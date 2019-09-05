@@ -37,8 +37,8 @@ class Test{
     async createConnect(){
         let ok = false;
         while(true){
-            await this.pomelo.request('connector.clubHandler.createClub',{clubName: 'test'}).then((data)=>{
-                this.clubId = data.info.clubId;
+            await this.pomelo.request('connector.clubHandler.createClub',{clubName: '休闲大联盟'}).then((data)=>{
+                this.clubId = data.clubInfo.clubId;
                 return data;
             }).then((data)=>{
                 let playwayCfg = {
@@ -56,7 +56,7 @@ class Test{
                 }
                 return this.pomelo.request('connector.clubHandler.setClubPlayway', playwayCfg);
             }).then((data)=>{
-                this.playwayId = data.cfg.id;
+                this.playwayId = data.playwayCfg.id;
                 return this.pomelo.request('connector.lobbyHandler.getGameServerAdr', {gameId: 15})
             }).then((data)=>{
                 this.ip = data.host;
@@ -78,6 +78,7 @@ class Test{
                 ok = true ;                                                                             
             }).catch((err)=>{
                 logger.error(this.code+":createConnect err:"+err);
+                ok = true ;
             });
 
             if( ok ){
