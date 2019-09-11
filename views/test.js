@@ -57,7 +57,7 @@ class Test{
                 return this.pomelo.request('connector.clubHandler.setClubPlayway', playwayCfg);
             }).then((data)=>{
                 this.playwayId = data.playwayCfg.id;
-                return this.pomelo.request('connector.lobbyHandler.getGameServerAdr', {gameId: 15})
+                return this.pomelo.request('connector.lobbyHandler.enterTable', {gameId: 15})
             }).then((data)=>{
                 this.ip = data.host;
                 this.port = data.port;
@@ -73,6 +73,22 @@ class Test{
                     playwayId: this.playwayId,
                 })
                                                                                                
+            }).then(()=>{
+                this.ip = this.client.host;
+                this.port = this.client.port;
+                return this.pomelo.disconnect();
+            }).then(()=>{
+                this.pomelo = new pomeloClient();
+                return this.pomelo.init({ host: this.ip, port: this.port, log: true, code: this.client.code }) ;
+
+            }).then(()=>{
+                //login
+                return this.pomelo.request("connector.entryHandler.enter",
+                                        {
+                                            code: this.client.code,
+                                            userInfo: this.client._getLoginUserInfo(),
+                                            platform: 'WIN'
+                                        });    
             }).then( async(data)=>{     
                 logger.info('完成-------------------')     
                 ok = true ;                                                                             
