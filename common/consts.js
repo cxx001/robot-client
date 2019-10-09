@@ -29,7 +29,7 @@ module.exports = {
         ALREADY_ONLINE: 1,  // 已经在线
 	},
 
-	ServerAdrCode: {
+	EnterGameCode: {
 		OK: 0,
 		GAME_SERVER_NO_OPEN: 1, //游戏服未开启
 		GAME_SERVER_NO_EXIST: 2, //游戏服不存在
@@ -97,12 +97,27 @@ module.exports = {
 	// 俱乐部code
 	ClubCode: {
 		OK: 0,
-		CLUB_NAME_ERROR: 1,   //名字不合法
-		CLUB_NO_EXIST: 2, 	//俱乐部不存在
-		CLUB_ID_ERROR: 3,	//俱乐部ID错误
-		CLUB_SET_PLAYWAY_TYPE_ERROR: 4, //设置玩法类型错误
-		CLUB_ALREADY_APPLY: 5,   //已经申请
-		CLUB_MEMBER_NOIN_APPLY_LIST: 6,  //成员不在申请列表
-		CLUB_PLAYWAY_NO_EXIST: 7,  //俱乐部玩法不存在
+		FAIL: 1,
+		CLUB_NAME_ERROR: 2, //名字不合法
+		CLUB_NO_EXIST: 3, 	//俱乐部不存在
+		CLUB_ID_ERROR: 4,	//俱乐部ID错误
+		CLUB_PLAYWAY_NO_EXIST: 5,  //俱乐部玩法不存在
+		CLUB_PLAYER_NO_EXIST: 6, //俱乐部玩家不存在
+        CLUB_LIST_NULL: 7,  //俱乐部列表为空
+		CLUB_MEM_EXIST: 8, //俱乐部成员已经存在
+		CLUB_PLAYER_ID_ERROR: 9, //玩家ID输入错误
+		CLUB_PERMISSION_ERROR: 10, //权限错误
 	},
+
+	ClubApplyCode: {
+		OK: 0,
+		APPLY_NO_EXIST: 1, // 俱乐部不存在
+		APPLY_USER_APPLYED: 2, //已经申请
+		APPLY_MEMBER_NO_EXIST: 3, //成员不在申请列表
+    },
+    
+    AddClubMemType: {
+        CREATE_INVATE_CODE: 1, //创建邀请码
+        BIND_LAST_ID: 2, //绑定上级
+    }
 }

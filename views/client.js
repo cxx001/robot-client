@@ -41,6 +41,18 @@ class Client{
 		await utils.sleep(1000);
 		
 		// 进入俱乐部
+		this.pomelo.request('connector.clubHandler.refreshClub', {clubId: this.clubId}).then((data)=>{
+			if (data.code == consts.ClubCode.OK) {
+				// 进入成功
+			} else if(data.code == consts.ClubCode.CLUB_PLAYER_NO_EXIST) {
+				// 玩家不在俱乐部
+				
+			} else{
+				logger.error('enter club error:', data);
+				this.pomelo.disconnect();
+				return;
+			}
+		});
 
 		// 找没满桌子加入
 
