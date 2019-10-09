@@ -11,7 +11,7 @@ log4js.configure({
             type: "dateFile",
             filename: __dirname + '/../'+logDir+'/debug/log-',
             encoding: "utf-8",
-            //maxLogSize: 1000000,
+            maxLogSize: 1048576,
             //numBackups: 3,
             pattern: "yyyy-MM-dd.log",
             alwaysIncludePattern: true
@@ -20,7 +20,7 @@ log4js.configure({
             type: "dateFile",
             filename: __dirname + '/../'+logDir+'/debug/a_mark-',
             encoding: "utf-8",
-            //maxLogSize: 1000000,
+            maxLogSize: 1048576,
             //numBackups: 3,
             pattern: "yyyy-MM-dd.log",
             alwaysIncludePattern: true

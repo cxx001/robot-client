@@ -2,68 +2,57 @@
 let logger = require('../util/logger').getLogger();
 let pomeloClient = require('../net/pomelo-client');
 let utils = require('../util/utils');
-let playerData = require('../dataMgr/playerData');
-let names = require('./names');
-
-let Lobby = require('../views/lobby');
-let PDK = require('./pdk');
-let Test = require('./test');
+let UserData = require('../dataMgr/userData');
+let RobotCfg = require('../common/robotCfg');
+let Game15 = require('./game15');
 
 const C_HOST =  '127.0.0.1';
-// const C_HOST =  '47.99.50.101';
 const C_PORT = 8686;
 
 class Client{
-    constructor(openid){
+    constructor(openid, gameId, index){
         this.host = C_HOST;
         this.port = C_PORT;
         this.hostGateway = C_HOST;
         this.portGateway = C_PORT;        
         this.code = openid;
-        this.openid = openid;
+		this.openid = openid;
+		this.gameId = gameId;
+		this.index = index;
         this.mainLoop();
     }
 
     reset(){
-        this.pomelo = null ;   
-        this.loginRespInf = null ; 
-        this.playerData = null;
+        this.pomelo = null;   
+        this.loginData = null; 
+        this.userData = null;
     }
     
     async mainLoop(){
         this.reset();
-        await this.createConnect();      
+        await this.createConnect();
 
-        this.playerData = new playerData();
-        this.playerData.init(this.pomelo, this.loginRespInf);
+        this.userData = new UserData();
+        this.userData.init(this.pomelo, this.loginData);
         this.pomelo.on('close',this.onClose.bind(this) );
         this.pomelo.on('io-error',this.onError.bind(this) );
         await utils.sleep(1000);
 
-        let m = 'test';
-        switch(m){
-            case 'test':
-                let test = new Test(this);
-                await test.mainLoop();
-                break;
-            case 'lobby':
-                let lobby = new Lobby(this);
-                await lobby.mainLoop();
+        switch(this.gameId){
+			case 15:
+				let game15 = new Game15(this);
+				await game15.mainLoop();
 				break;
-			case 'pdk':
-				let pdk = new PDK(this);
-				await pdk.mainLoop();
-				break;                                            
+			default:
+				logger.warn('no exist switch case[%d].', this.gameId);
+				this.pomelo.disconnect();
         }
-
-        //await utils.sleep(10000);
-        //await this.pomelo.disconnect();
     }
 
     async onClose(event){       
-        // logger.error(this.code,'onClose', event.data);   
+        logger.info(this.code, 'onClose', event.data);   
         // await utils.sleep(3*1000); 
-        // process.nextTick( this.mainLoop.bind(this) );
+        // process.nextTick( this.mainLoop.bind(this));
     }
 
     onError(event){
@@ -80,11 +69,10 @@ class Client{
             }).then((data)=>{
                 if (data.code == consts.Login.MAINTAIN) {
                     this._handleMaintainState();
-                    throw consts.Login.MAINTAIN ;
+                    throw consts.Login.MAINTAIN;
                 }    
-                console.log("resp:gate.gateHandler.queryEntry->", data);
-                this.host = data.host ;
-                this.port = data.port ;   
+                this.host = data.host;
+                this.port = data.port;
                 return pomelo.disconnect();    
             }).then(()=>{
                 //connenct 逻辑服
@@ -95,22 +83,21 @@ class Client{
                 return pomelo.request("connector.entryHandler.enter",
                                         {
                                             code: this.code,
-                                            userInfo: this._getLoginUserInfo(),
+                                            userInfo: this._getUserInfo(),
                                             platform: 'WIN'
-                                        });    
+                                        });
             }).then( async(data)=>{     
                 if (data.code == consts.Login.RELAY) {
                     console.log("重连 ip:%s port:%s", data.host, data.port);
                     // 重定向
                     await pomelo.disconnect();  
-                    throw 'consts.Login.RELAY' ;  
+                    throw 'consts.Login.RELAY';  
                 }
                 else if (data.code == consts.Login.OK) {
-                    console.log("连接逻辑服 成功 info: ", data.info);
-                    this.loginRespInf = data.info ;
-                   
-                    this.pomelo = pomelo ;                 
-                    ok = true ;                       
+                    console.log("连接逻辑服成功 info: ", data.info);
+                    this.loginData = data.info;
+                    this.pomelo = pomelo;                 
+                    ok = true;                  
                 }
                 else if (data.code == consts.Login.MAINTAIN) {
                     that._handleMaintainState();
@@ -132,34 +119,32 @@ class Client{
         }
     }
 
-    _getLoginUserInfo(){
-		// if (typeof this.index == 'number') {
-		// 	var headname = 'http://47.99.50.101:9999/' + 'head/avatar_' + this.index + '.png';
-		// } else {
-		// 	var headname = '';
-		// }
-		
-        // return {
-        //     name:names[this.index] || this.openid,
-        //     gender:this.gender,
-        //     avatarUrl:headname
-        // };
-
-        return {
-            name: this.code,
-            gender: 1,
-            avatarUrl: ""
-        }
+    _getUserInfo(){
+		let robotInfos = RobotCfg[this.gameId];
+		let info = null;
+		if (robotInfos && robotInfos[this.index]) {
+			info = {
+				name: robotInfos[this.index].name,
+				gender: robotInfos[this.index].gender,
+				avatarUrl: robotInfos[this.index].avatarUrl
+			}
+		} else {
+			info = {
+				name: this.code,
+				gender: 1,
+				avatarUrl: ""
+			}
+		}
+        return info;
     }
 
     _onLoginFailed(){
-       logger.info('------------enter _onLoginFailed');             
+		logger.info('------------enter _onLoginFailed');
     }
 
     _handleMaintainState(){
-        logger.info('------------enter _handleMaintainState');   
+        logger.info('------------enter _handleMaintainState');
     }
 };
 
-
-module.exports = Client ;
+module.exports = Client;
