@@ -65,7 +65,7 @@ class Client{
     }
 
     async onError(event){
-        logger.error(this.code,'OnError', event );
+        logger.error(this.code,'onError', event );
     }
 
     async createConnect(){
