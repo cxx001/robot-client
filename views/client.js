@@ -45,7 +45,7 @@ class Client{
 		this.pomelo.request('connector.clubHandler.enterClub', {clubId: this.clubId}).then((data)=>{
 			if (data.code == consts.ClubCode.OK) {
 				// 进入成功
-				logger.info('[%s]进入俱乐部:%o', this.userData.name, data)
+				this.enterTable()
 			} else if(data.code == consts.ClubCode.CLUB_PLAYER_NO_EXIST) {
 				// 玩家不在俱乐部
 				this.pomelo.request('connector.clubHandler.joinClubByCode', {invateCode: this.invateCode}).then((data)=>{
@@ -54,7 +54,7 @@ class Client{
 						this.pomelo.disconnect();
 						return;
 					}
-					logger.info('[%s]加入俱乐部%o', this.userData.name, data)
+					this.enterTable()
 				});
 			} else{
 				logger.error('enter club error:', data);
@@ -77,7 +77,17 @@ class Client{
 		// 		logger.warn('no exist switch case[%d].', gameId);
 		// 		this.pomelo.disconnect();
         // }
-    }
+	}
+	
+	async enterTable() {
+		// TODO:暂时简单处理，随机延时加入
+		let time = utils.randomInt(1, 10)
+		await utils.sleep(time);
+
+		this.pomelo.request('connector.clubHandler.getClubTable', {clubId: this.clubId}).then((data)=>{
+			
+		})
+	}
 
     async onClose(event){       
         logger.info(this.code, 'onClose', event.data);   
