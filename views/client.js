@@ -10,7 +10,8 @@ const C_HOST =  '127.0.0.1';
 const C_PORT = 8686;
 
 class Client{
-    constructor(openid, clubId, inviteCode, index){
+    constructor(openid, invateCode, index){
+		let clubId = Number(String(invateCode).substring(0, 3));
         this.host = C_HOST;
         this.port = C_PORT;
         this.hostGateway = C_HOST;
@@ -18,7 +19,7 @@ class Client{
         this.code = openid;
 		this.openid = openid;
 		this.clubId = clubId;
-		this.inviteCode = inviteCode;
+		this.invateCode = invateCode;
 		this.index = index;
         this.mainLoop();
     }
@@ -41,12 +42,20 @@ class Client{
 		await utils.sleep(1000);
 		
 		// 进入俱乐部
-		this.pomelo.request('connector.clubHandler.refreshClub', {clubId: this.clubId}).then((data)=>{
+		this.pomelo.request('connector.clubHandler.enterClub', {clubId: this.clubId}).then((data)=>{
 			if (data.code == consts.ClubCode.OK) {
 				// 进入成功
+				logger.info('[%s]进入俱乐部:%o', this.userData.name, data)
 			} else if(data.code == consts.ClubCode.CLUB_PLAYER_NO_EXIST) {
 				// 玩家不在俱乐部
-				
+				this.pomelo.request('connector.clubHandler.joinClubByCode', {invateCode: this.invateCode}).then((data)=>{
+					if (data.code != consts.ClubCode.OK) {
+						logger.error('join club error:', data);
+						this.pomelo.disconnect();
+						return;
+					}
+					logger.info('[%s]加入俱乐部%o', this.userData.name, data)
+				});
 			} else{
 				logger.error('enter club error:', data);
 				this.pomelo.disconnect();
@@ -148,11 +157,12 @@ class Client{
     _getUserInfo(){
 		let robotInfos = RobotCfg[this.clubId];
 		let info = null;
-		if (robotInfos && robotInfos[this.index]) {
+		if (robotInfos && robotInfos[this.index-1]) {
+			let robotData = robotInfos[this.index-1];
 			info = {
-				name: robotInfos[this.index].name,
-				gender: robotInfos[this.index].gender,
-				avatarUrl: robotInfos[this.index].avatarUrl
+				name: robotData.name,
+				gender: robotData.gender,
+				avatarUrl: robotData.avatarUrl
 			}
 		}
         return info;

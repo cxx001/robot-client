@@ -30,8 +30,8 @@ class UserData{
 
     // 监听服务器推送消息
     _initNetEvent() {
-        this.pomelo.on('onAvatarPropUpdate', (data) => {
-			console.log('玩家信息:', data);
+        this.pomelo.on('onjoinClub', (data) => {
+			console.log('onjoinClub:', data);
         });
     }
 };

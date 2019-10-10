@@ -1,5 +1,5 @@
 /**
- * cmd: node robot.js clubId inviteCode robotNum
+ * cmd: node robot.js invateCode robotNum
  */
 
 let logger2 = require('./util/logger').getLogger('mark');       
@@ -23,19 +23,18 @@ process.on('unhandledRejection',
 );
 
 let arguments = process.argv.splice(2);
-if (arguments.length < 2) {
+if (arguments.length < 1) {
     logger2.error('argumemnt error.');
 	process.exit(1);
 }
 
-let clubId = arguments[0];
-let inviteCode =  arguments[1];
-let robotNum = arguments[2] || 10;
+let invateCode =  arguments[0];
+let robotNum = arguments[1] || 10;
 let run = async function(){
     let clients = [];
     for(let i = 1; i <= robotNum; i++ ){
-        let openid = 'robot_' + clubId + '_' + i;
-		let client = new Client(openid, clubId, inviteCode, i);
+		let openid = 'robot_' + invateCode + '_' + i;
+		let client = new Client(openid, invateCode, i);
 		clients.push(client);
 	}
 }
