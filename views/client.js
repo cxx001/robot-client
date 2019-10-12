@@ -2,6 +2,7 @@
 let logger = require('../util/logger').getLogger();
 let pomeloClient = require('../net/pomelo-client');
 let utils = require('../util/utils');
+let lodash = require('lodash');
 let UserData = require('../dataMgr/userData');
 let RobotCfg = require('../common/robotCfg');
 let Game15 = require('./game15');
@@ -27,7 +28,8 @@ class Client{
     reset(){
         this.pomelo = null;   
         this.loginData = null; 
-        this.userData = null;
+		this.userData = null;
+		this.playways = null;
     }
     
     async mainLoop(){
@@ -63,10 +65,6 @@ class Client{
 			}
 		});
 
-		// 找没满桌子加入
-
-		// 如果没有桌子,则创建桌子
-		
 		// 进入游戏
         // switch(gameId){
 		// 	case 15:
@@ -84,9 +82,62 @@ class Client{
 		let time = utils.randomInt(1, 10)
 		await utils.sleep(time);
 
-		this.pomelo.request('connector.clubHandler.getClubTable', {clubId: this.clubId}).then((data)=>{
-			
-		})
+		let ok = false;
+        while(true) {
+			// 是否设置了玩法
+			await this.pomelo.request('connector.clubHandler.getClubPlayway', {clubId: this.clubId}).then((data)=>{
+				if (data.code != 0) {
+					throw '获取俱乐部玩法失败!';
+				}
+				this.playways = data.playways;
+				if (this.playways.length > 0) {
+					return this.playways;
+				}
+			}).then((data) => {
+				// 获取现有桌子
+				return this.pomelo.request('connector.clubHandler.getClubTable', {clubId: this.clubId});
+			}).then((data) => {
+				if (data.code != 0) {
+					throw '获取俱乐部桌子信息失败!';
+				}
+				let playway = lodash.sample(this.playways);
+				let tableInfos = data.tableInfos;
+				if (tableInfos.length <= 0) {
+					// 创建桌子
+					return this.pomelo.request('connector.lobbyHandler.enterTable', {gameId: playway.gameId});
+				} else {
+					for (let i = 0; i < tableInfos.length; i++) {
+						const table = tableInfos[i];
+						if (table.players.length < table.chairCount) {
+							// 加入没满桌子
+							return xxx;
+						}
+					}
+					return this.pomelo.request('connector.lobbyHandler.enterTable', {gameId: playway.gameId});
+				}
+			}).then((data)=>{
+				this.ip = data.host;
+				this.port = data.port;
+				return this.pomelo.disconnect();
+			}).then(()=>{
+				this.pomelo = new pomeloClient();
+				return this.pomelo.init({ host: this.ip, port: this.port, log: true, code: this.code}) ;
+			}).then(()=>{
+				return this.pomelo.request("table.entryHandler.enter", {
+					openid: this.openid,
+					clubId: this.clubId,
+					playwayId: this.playwayId,
+				})
+			}).catch((err)=>{
+				logger.error(err);
+			})
+
+			if( ok ){
+                break;
+            }else{
+                await utils.sleep(3*1000);
+            }
+		}
 	}
 
     async onClose(event){       
@@ -110,7 +161,7 @@ class Client{
                 if (data.code == consts.Login.MAINTAIN) {
                     this._handleMaintainState();
                     throw consts.Login.MAINTAIN;
-                }    
+                }
                 this.host = data.host;
                 this.port = data.port;
                 return pomelo.disconnect();    
