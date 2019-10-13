@@ -14,9 +14,7 @@ class Client{
     constructor(openid, invateCode, index){
 		let clubId = Number(String(invateCode).substring(0, 3));
         this.host = C_HOST;
-        this.port = C_PORT;
-        this.hostGateway = C_HOST;
-        this.portGateway = C_PORT;        
+        this.port = C_PORT;      
         this.code = openid;
 		this.openid = openid;
 		this.clubId = clubId;
@@ -29,169 +27,28 @@ class Client{
         this.pomelo = null;   
         this.loginData = null; 
 		this.userData = null;
-		this.playways = null;
+        this.playways = null;
+        this.gameId = null;
     }
     
     async mainLoop(){
 		this.reset();
 		
-		// 登入
+		// 登入大厅
         await this.createConnect();
         this.userData = new UserData();
         this.userData.init(this.pomelo, this.loginData);
-        this.pomelo.on('close',this.onClose.bind(this));
-        this.pomelo.on('io-error',this.onError.bind(this));
 		await utils.sleep(1000);
 		
 		// 进入俱乐部
-		this.pomelo.request('connector.clubHandler.enterClub', {clubId: this.clubId}).then((data)=>{
-			if (data.code == consts.ClubCode.OK) {
-				// 进入成功
-				this.enterTable()
-			} else if(data.code == consts.ClubCode.CLUB_PLAYER_NO_EXIST) {
-				// 玩家不在俱乐部
-				this.pomelo.request('connector.clubHandler.joinClubByCode', {invateCode: this.invateCode}).then((data)=>{
-					if (data.code != consts.ClubCode.OK) {
-						logger.error('join club error:', data);
-						this.pomelo.disconnect();
-						return;
-					}
-					this.enterTable()
-				});
-			} else{
-				logger.error('enter club error:', data);
-				this.pomelo.disconnect();
-				return;
-			}
-		});
-
-		// 进入游戏
-        // switch(gameId){
-		// 	case 15:
-		// 		let game15 = new Game15(this);
-		// 		await game15.mainLoop();
-		// 		break;
-		// 	default:
-		// 		logger.warn('no exist switch case[%d].', gameId);
-		// 		this.pomelo.disconnect();
-        // }
-	}
-	
-	async enterTable() {
-		// TODO:暂时简单处理，随机延时加入
-		let time = utils.randomInt(1, 10)
-        await utils.sleep(time);
-        
-        // 是否已经在牌桌里了
-        let gameInfo = this.loginData.gameInfo;
-        if (gameInfo.code == 1) {
-            let info = gameInfo.gameInfo;
-            logger.info('%s已经在牌桌. gameInfo = %o', this.code, info);
-            this.tableId = info.tableId;
-            this.enterGame(info.ip, info.port);
-            return;
-        }
-
-		let ok = false;
-        while(true) {
-			// 是否设置了玩法
-			await this.pomelo.request('connector.clubHandler.getClubPlayway', {clubId: this.clubId}).then((data)=>{
-				if (data.code != 0) {
-					throw '获取俱乐部玩法失败!';
-				}
-				this.playways = data.playways;
-				if (this.playways.length > 0) {
-					return this.playways;
-				} else{
-                    logger.info('俱乐部[%d]还没有设置玩法.', this.clubId);
-                    throw '请先设置俱乐部玩法.'
-                }
-			}).then((data) => {
-				// 获取现有桌子
-				return this.pomelo.request('connector.clubHandler.getClubTable', {clubId: this.clubId});
-			}).then((data) => {
-				if (data.code != 0) {
-					throw '获取俱乐部桌子信息失败!';
-				}
-                let playway = lodash.sample(this.playways);
-                this.playwayId = playway.id;
-
-				let tableInfos = data.tableInfos;
-				if (tableInfos.length <= 0) {
-                    // 创建桌子
-                    logger.info('创建桌子 playway = ', playway);
-					return this.pomelo.request('connector.lobbyHandler.enterTable', {gameId: playway.gameId});
-				} else {
-					for (let i = 0; i < tableInfos.length; i++) {
-						const table = tableInfos[i];
-						if (table.players.length < table.chairCount) {
-                            // 加入没满桌子
-                            logger.info('加入桌子 table = ', table);
-                            this.tableId = table.tableId;
-							return table;
-						}
-                    }
-                    logger.info('创建桌子2 playway = ', playway);
-					return this.pomelo.request('connector.lobbyHandler.enterTable', {gameId: playway.gameId});
-				}
-			}).then((data)=>{
-				this.host = data.host;
-                this.port = data.port;
-                ok = this.enterGame(this.host, this.port);
-			}).catch((err)=>{
-				logger.warn(err);
-			})
-
-			if( ok ){
-                break;
-            }else{
-                logger.info('重新循环')
-                await utils.sleep(3*1000);
-                this.pomelo.disconnect();
-                await this.createConnect();
-            }
-		}
+		await this.enterClub();
     }
     
-    async enterGame(host, port) {
-        let ok = false;
-        this.pomelo.disconnect();
-        this.pomelo = new pomeloClient();
-        await this.pomelo.init({ host: host, port: port, log: true, code:this.code } ).then(()=>{
-            return  this.pomelo.request("table.entryHandler.enter", {
-                openid: this.openid,
-                clubId: this.clubId,
-                playwayId: this.playwayId || '',
-                tableId: this.tableId || 0,
-            })
-        }).then((data) => {
-            if (data.code == 0) {
-                ok = true;
-                logger.info('%s加入牌桌成功.', this.code);
-            } else{
-                logger.warn('%s加入牌桌失败. data = %o', this.code, data);
-            }
-        }).catch((err)=>{
-            logger.warn(err);
-        })
-        return ok;
-    }
-
-    async onClose(event){       
-        logger.info(this.code, 'onClose', event.data);   
-        // await utils.sleep(3*1000); 
-        // process.nextTick( this.mainLoop.bind(this));
-    }
-
-    async onError(event){
-        logger.error(this.code,'onError', event );
-    }
-
     async createConnect(){
         let ok = false;
         while(true){
             let pomelo = new pomeloClient();
-            let r = await pomelo.init({ host: this.hostGateway, port: this.portGateway, log: true, code:this.code } ).then( ()=>{
+            let r = await pomelo.init({ host: this.host, port: this.port, log: true, code:this.code } ).then( ()=>{
                 // 获取逻辑服 地址
                 return  pomelo.request("gate.gateHandler.queryEntry", { code: this.code });
             }).then((data)=>{
@@ -221,7 +78,7 @@ class Client{
                                         });
             }).then( async(data)=>{     
                 if (data.code == consts.Login.RELAY) {
-                    console.log("重连 ip:%s port:%s", data.host, data.port);
+                    console.log("重连 host:%s port:%s", data.host, data.port);
                     // 重定向
                     await pomelo.disconnect();  
                     throw 'consts.Login.RELAY';  
@@ -272,6 +129,145 @@ class Client{
 
     _handleMaintainState(){
         logger.info('------------enter _handleMaintainState');
+    }
+
+    async enterClub() {
+        this.pomelo.request('connector.clubHandler.enterClub', {clubId: this.clubId}).then((data)=>{
+			if (data.code == consts.ClubCode.OK) {
+				// 进入成功
+				this.findTable()
+			} else if(data.code == consts.ClubCode.CLUB_PLAYER_NO_EXIST) {
+				// 玩家不在俱乐部
+				this.pomelo.request('connector.clubHandler.joinClubByCode', {invateCode: this.invateCode}).then((data)=>{
+					if (data.code != consts.ClubCode.OK) {
+						logger.error('join club error:', data);
+						this.pomelo.disconnect();
+						return;
+					}
+					this.findTable()
+				});
+			} else{
+				logger.error('enter club error:', data);
+				this.pomelo.disconnect();
+				return;
+			}
+		});
+    }
+	
+	async findTable() {
+		// TODO:暂时简单处理，随机延时加入
+		let time = utils.randomInt(1, 10)
+        await utils.sleep(time);
+        
+        // 是否已经在牌桌里了
+        let gameInfo = this.loginData.gameInfo;
+        if (gameInfo.code == 1) {
+            let info = gameInfo.gameInfo;
+            logger.info('%s已经在牌桌. gameInfo = %o', this.code, info);
+            this.gameId = info.gameId
+            this.tableId = info.tableId;
+            this.enterTable(info.host, info.port);
+            return;
+        }
+
+		let ok = false;
+        while(true) {
+			// 是否设置了玩法
+			await this.pomelo.request('connector.clubHandler.getClubPlayway', {clubId: this.clubId}).then((data)=>{
+				if (data.code != 0) {
+					throw '获取俱乐部玩法失败!';
+				}
+				this.playways = data.playways;
+				if (this.playways.length > 0) {
+					return this.playways;
+				} else{
+                    logger.info('俱乐部[%d]还没有设置玩法.', this.clubId);
+                    throw '请先设置俱乐部玩法.'
+                }
+			}).then((data) => {
+				// 获取现有桌子
+				return this.pomelo.request('connector.clubHandler.getClubTable', {clubId: this.clubId});
+			}).then((data) => {
+				if (data.code != 0) {
+					throw '获取俱乐部桌子信息失败!';
+				}
+                let playway = lodash.sample(this.playways);
+                this.gameId = playway.gameId;
+                this.playwayId = playway.id;
+				let tableInfos = data.tableInfos;
+				if (tableInfos.length <= 0) {
+                    // 创建桌子
+                    logger.info('创建桌子 playway = ', playway);
+					return this.pomelo.request('connector.lobbyHandler.enterTable', {gameId: playway.gameId});
+				} else {
+					for (let i = 0; i < tableInfos.length; i++) {
+						const table = tableInfos[i];
+						if (table.players.length < table.chairCount) {
+                            // 加入没满桌子
+                            logger.info('加入桌子 table = ', table);
+                            this.tableId = table.tableId;
+							return table;
+						}
+                    }
+                    logger.info('创建桌子2 playway = ', playway);
+					return this.pomelo.request('connector.lobbyHandler.enterTable', {gameId: playway.gameId});
+				}
+			}).then((data)=>{
+				this.host = data.host;
+                this.port = data.port;
+                ok = this.enterTable(this.host, this.port);
+			}).catch((err)=>{
+				logger.warn(err);
+			})
+
+			if( ok ){
+                break;
+            }else{
+                logger.info('重新循环查找桌子')
+                await utils.sleep(3*1000);
+                this.pomelo.disconnect();
+                await this.createConnect();
+            }
+		}
+    }
+    
+    async enterTable(host, port) {
+        let ok = false;
+        this.pomelo.disconnect();
+        this.pomelo = new pomeloClient();
+
+        await this.pomelo.init({ host: host, port: port, log: true, code:this.code });
+
+        let msg = {
+            openid: this.openid,
+            clubId: this.clubId,
+            playwayId: this.playwayId || '',
+            tableId: this.tableId || 0,
+        }
+        await this.pomelo.request("table.entryHandler.enter", msg, (data) => {
+            if (data.code == 0) {
+                ok = true;
+                logger.info('%s加入牌桌成功.', this.code);
+                this.enterGame(this.gameId);
+                
+            } else{
+                logger.warn('%s加入牌桌失败. data = %o', this.code, data);
+            }
+        })
+
+        return ok;
+    }
+
+    async enterGame(gameId) {
+        switch(gameId){
+            case 15:
+                let game15 = new Game15(this);
+                await game15.mainLoop();
+                break;
+            default:
+                logger.warn('no exist switch gameId[%d].', gameId);
+                this.pomelo.disconnect();
+        }
     }
 };
 

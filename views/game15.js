@@ -8,23 +8,29 @@ class Game15{
         this.client = client ;
         this.pomelo = client.pomelo ;
 		this.userData = client.userData;
+		this._initNetEvent();
+	}
 
-		// 监听服务端推送消息
-		this.pomelo.on('onStartGame',this._onStartGame.bind(this));
+	_initNetEvent() {
+		this.pomelo.on('onUserEntryRoom',this.onUserEntryRoom.bind(this));
+		this.pomelo.on('onSendParameter',this.onSendParameter.bind(this));
+		this.pomelo.on('onSendGameScene',this.onSendGameScene.bind(this));
 	}
 
     async mainLoop(){
-		// 进入房间
-		let msg = {
-			gameType: this.gameType,
-			stage: this.stage
-		}
-		await this.pomelo.request('connector.matchHandler.enterGoldRoom', msg).then((data)=>{
-
-		})
+		logger.info('-----------进入牌桌-----------')
 	}
 	
-	_onStartGame(data){
+	onUserEntryRoom(data){
+		logger.info(data);
+	}
+
+	onSendParameter(data){
+		logger.info(data);
+	}
+
+	onSendGameScene(data){
+		logger.info(data);
 	}
 };
 
