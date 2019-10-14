@@ -35,7 +35,7 @@ class UserData{
 
     async onError(event){
         console.log(this.name, 'onError', event );
-    }
+	}
 };
 
 module.exports = UserData;

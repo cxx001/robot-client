@@ -156,7 +156,7 @@ class Client{
 	
 	async findTable() {
 		// TODO:暂时简单处理，随机延时加入
-		let time = utils.randomInt(1, 10)
+		let time = utils.randomInt(1, 10) * 1000;
         await utils.sleep(time);
         
         // 是否已经在牌桌里了
