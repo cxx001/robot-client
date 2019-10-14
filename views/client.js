@@ -1,5 +1,4 @@
-﻿let consts = require('../common/consts');
-let logger = require('../util/logger').getLogger();
+﻿let logger = require('../util/logger').getLogger();
 let pomeloClient = require('../net/pomelo-client');
 let utils = require('../util/utils');
 let lodash = require('lodash');
@@ -48,13 +47,13 @@ class Client{
         let ok = false;
         while(true){
             let pomelo = new pomeloClient();
-            let r = await pomelo.init({ host: this.host, port: this.port, log: true, code:this.code } ).then( ()=>{
+            let r = await pomelo.init({ host: C_HOST, port: C_PORT, log: true, code:this.code } ).then( ()=>{
                 // 获取逻辑服 地址
                 return  pomelo.request("gate.gateHandler.queryEntry", { code: this.code });
             }).then((data)=>{
-                if (data.code == consts.Login.MAINTAIN) {
+                if (data.code == 202) {
                     this._handleMaintainState();
-                    throw consts.Login.MAINTAIN;
+                    throw '服务器维护中';
                 }
                 this.host = data.host;
                 this.port = data.port;
@@ -77,19 +76,19 @@ class Client{
                                             platform: 'WIN'
                                         });
             }).then( async(data)=>{     
-                if (data.code == consts.Login.RELAY) {
+                if (data.code == 201) {
                     console.log("重连 host:%s port:%s", data.host, data.port);
                     // 重定向
                     await pomelo.disconnect();  
-                    throw 'consts.Login.RELAY';  
+                    throw '重新登入';  
                 }
-                else if (data.code == consts.Login.OK) {
+                else if (data.code == 200) {
                     console.log("连接逻辑服成功 info: ", data.info);
                     this.loginData = data.info;
                     this.pomelo = pomelo;                 
                     ok = true;                  
                 }
-                else if (data.code == consts.Login.MAINTAIN) {
+                else if (data.code == 202) {
                     this._handleMaintainState();
                     throw null;
                 }
@@ -133,13 +132,13 @@ class Client{
 
     async enterClub() {
         this.pomelo.request('connector.clubHandler.enterClub', {clubId: this.clubId}).then((data)=>{
-			if (data.code == consts.ClubCode.OK) {
+			if (data.code == 0) {
 				// 进入成功
 				this.findTable()
-			} else if(data.code == consts.ClubCode.CLUB_PLAYER_NO_EXIST) {
+			} else if(data.code == 6) {
 				// 玩家不在俱乐部
 				this.pomelo.request('connector.clubHandler.joinClubByCode', {invateCode: this.invateCode}).then((data)=>{
-					if (data.code != consts.ClubCode.OK) {
+					if (data.code != 0) {
 						logger.error('join club error:', data);
 						this.pomelo.disconnect();
 						return;

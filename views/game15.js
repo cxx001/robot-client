@@ -1,4 +1,3 @@
-let consts = require('../common/consts');
 let logger = require('../util/logger').getLogger();
 let utils = require('../util/utils')
 let Game15Logic = require('./game15Logic');
@@ -13,9 +12,16 @@ class Game15{
 	}
 
 	reset() {
-		this.myChairID = null;
 		this.tableCfg = null;
 		this.leaveSchedule = null;
+		this.myChairID = null;
+		this.wCurrentUser = null;
+		this.cbCardData = null;
+		this.bCardCount = null;
+		this.turnCardData = null;
+		this.turnCardCount = null;
+		this.bNextWarn = null;
+		this.outcardUser = null;
 	}
 
 	_initNetEvent() {
@@ -27,7 +33,6 @@ class Game15{
 		this.pomelo.on('onOutCard',this.onOutCard.bind(this));
 		this.pomelo.on('onPassCard',this.onPassCard.bind(this));
 		this.pomelo.on('onSettlement',this.onSettlement.bind(this));
-		this.pomelo.on('onLeaveRoom',this.onLeaveRoom.bind(this));
 	}
 
     async mainLoop(){
@@ -39,9 +44,23 @@ class Game15{
 		this.tableCfg = data;
 	}
 
-	onSendGameScene(data){
+	async onSendGameScene(data){
 		if (data.gameStatus == 2) {
 			// 已经开始游戏
+			let gameParameter = this.tableCfg.gameParameter;
+			this.wCurrentUser = data.currentUser;
+			this.cbCardData = data.handCardData;
+			this.bCardCount = this.cbCardData.length;
+			this.myChairID = Game15Logic.GetChairIDByUid(this.userData.uid, data.players);
+			this.bNextWarn = data.bUserWarn[(this.myChairID+1)%gameParameter.bPlayerCount];
+			if (data.turnUser == this.wCurrentUser) {
+				this.turnCardData = [];
+				this.turnCardCount = 0;
+			} else{
+				this.turnCardData = data.turnCardData;
+				this.turnCardCount = data.turnCardCount;
+			}
+			this.playOutCard(1, 2);
 		} else {
 			// 准备界面
 			await utils.sleep(utils.randomInt(2, 4) * 1000);
@@ -60,27 +79,78 @@ class Game15{
 		this.myChairID = data.chairID;
 	}
 
-	onLeaveRoom(data){
-	}
-
 	onStartGame(data){
-		logger.info(data);
+		this._stopLeaveSchedule();
+		this.myChairID = data.wChairID;
+		this.wCurrentUser = data.wCurrentUser;
+		this.cbCardData = data.cbCardData;
+		this.bCardCount = this.cbCardData.length;
+		this.turnCardData = [];
+		this.turnCardCount = 0;
+		this.bNextWarn = false;
+		this.playOutCard(4, 6);
 	}
 
 	onWarnUser(data){
-		logger.info(data);
+		let gameParameter = this.tableCfg.gameParameter;
+		if (data.wWarnUser==(this.myChairID+1)%gameParameter.bPlayerCount)
+		{
+			this.bNextWarn = true;
+		}
 	}
 
 	onOutCard(data){
-		logger.info(data);
+		//删除扑克
+		if (data.outcardUser == this.myChairID) {
+			if(Game15Logic.RemoveCard(data.cardData,data.cardCount,this.cbCardData,this.bCardCount) == false)
+			{
+				logger.error('用户[%s]出牌删除失败.', this.userData.name);
+				return;
+			}
+		}
+
+		// 更新数据
+		this.wCurrentUser = data.currentUser;
+		this.outcardUser = data.outcardUser;
+		this.bCardCount = this.cbCardData.length;
+		this.turnCardData = data.cardData;
+		this.turnCardCount = data.cardCount;
+		
+		// 出牌
+		this.playOutCard();
 	}
 
 	onPassCard(data){
-		logger.info(data);
+		this.wCurrentUser = data.wCurrentUser;
+		if (this.outcardUser == this.wCurrentUser) {
+			// 都要不起
+			this.turnCardData = [];
+			this.turnCardCount = 0;
+		}
+		// 出牌
+		this.playOutCard();
 	}
 
-	onSettlement(data){
-		logger.info(data);
+	async onSettlement(data){
+		await utils.sleep(utils.randomInt(2, 6) * 1000);
+		await this.pomelo.request('table.tableHandler.readyGame', {}, (data) => {
+			if (data.code == 0) {
+				this._startLeaveSchedule();
+			}
+			else if(data.code == 3) {
+				//大结算
+				this.client.mainLoop();
+			} else{
+				this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
+					// 离开游戏
+					if (data.code == 0 || data.code == 3) {
+						this.client.mainLoop();
+					} else{
+						logger.warn('用户[%s]离开房间失败!', this.userData.name)
+					}
+				})
+			}
+		})
 	}
 
 	_startLeaveSchedule() {
@@ -91,7 +161,7 @@ class Game15{
 			this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
 				// 离开游戏
 				if (data.code == 0 || data.code == 3) {
-					
+					this.client.mainLoop();
 				}
 			})
 		}, dt);
@@ -103,6 +173,25 @@ class Game15{
 			this.leaveSchedule = null;
 		}
 	};
+
+	async playOutCard(lower, upper) {
+		lower = lower || 2;
+		upper = upper || 4;
+		if (this.wCurrentUser == this.myChairID) {
+			let OutCard = Game15Logic.AISearchOutCard(this.cbCardData, this.bCardCount, this.turnCardData, this.turnCardCount, this.bNextWarn);
+			if (OutCard && OutCard.bCardData.length > 0) {
+				let msg = {
+					bCardData: OutCard.bCardData,
+					bCardCount: OutCard.bCardCount
+				}
+				logger.info('用户[%s] 出牌:%o', this.userData.name, msg)
+				await utils.sleep(utils.randomInt(lower, upper) * 1000);
+				await this.pomelo.request('table.tableHandler.playCard', msg, (data) => {});
+			} else {
+				logger.info("要不起[%s]", this.userData.name);
+			}
+		}
+	}
 };
 
 module.exports = Game15;
