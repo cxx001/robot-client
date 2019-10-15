@@ -23,11 +23,15 @@ class Client{
     }
 
     reset(){
-        this.pomelo = null;   
+		if (this.pomelo) {
+			this.pomelo.disconnect();
+			this.pomelo = null; 
+		}
         this.loginData = null; 
 		this.userData = null;
         this.playways = null;
-        this.gameId = null;
+		this.gameId = null;
+		this.tableId = null;
     }
     
     async mainLoop(){

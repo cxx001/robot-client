@@ -65,7 +65,7 @@ class Game15{
 			// 准备界面
 			await utils.sleep(utils.randomInt(2, 4) * 1000);
 			await this.pomelo.request('table.tableHandler.readyGame', {}, (data) => {
-				if (data.code == 0) {
+				if (data.code == 0 || data.code == 1) {
 					this._startLeaveSchedule();
 				}
 			})

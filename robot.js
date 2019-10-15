@@ -17,8 +17,8 @@ process.on('uncaughtException',
 process.on('unhandledRejection',
 	async function (err) {
 		logger2.fatal("unhandledRejection:", err);
-		//await sleep(1000);
-		//process.exit(0);
+		await sleep(1000);
+		process.exit(0);
 	}
 );
 
