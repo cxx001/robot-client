@@ -23,13 +23,13 @@ process.on('unhandledRejection',
 );
 
 let arguments = process.argv.splice(2);
-if (arguments.length < 1) {
+if (arguments.length < 2) {
     logger2.error('argumemnt error.');
 	process.exit(1);
 }
 
 let invateCode =  arguments[0];
-let robotNum = arguments[1] || 10;
+let robotNum = arguments[1];
 let run = async function(){
     let clients = [];
     for(let i = 1; i <= robotNum; i++ ){

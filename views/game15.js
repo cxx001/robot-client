@@ -11,6 +11,10 @@ class Game15{
 		this.reset();
 	}
 
+	async init(){
+		logger.info('-----------游戏模块初始化:%d-----------', this.client.gameId);
+	}
+
 	reset() {
 		this.tableCfg = null;
 		this.leaveSchedule = null;
@@ -35,11 +39,6 @@ class Game15{
 		this.pomelo.on('onSettlement',this.onSettlement.bind(this));
 	}
 
-    async mainLoop(){
-		logger.info('-----------进入游戏:%d-----------', this.client.gameId);
-		
-	}
-	
 	onSendParameter(data){
 		this.tableCfg = data;
 	}

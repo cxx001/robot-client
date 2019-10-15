@@ -7,6 +7,7 @@ let RobotCfg = require('../common/robotCfg');
 let Game15 = require('./game15');
 
 const C_HOST =  '127.0.0.1';
+// const C_HOST =  '47.99.50.101';
 const C_PORT = 8686;
 
 class Client{
@@ -159,7 +160,7 @@ class Client{
 	
 	async findTable() {
 		// TODO:暂时简单处理，随机延时加入
-		let time = utils.randomInt(1000, 10 * 1000);
+		let time = utils.randomInt(2000, 15 * 1000);
         await utils.sleep(time);
         
         // 是否已经在牌桌里了
@@ -169,7 +170,9 @@ class Client{
             logger.info('%s已经在牌桌. gameInfo = %o', this.code, info);
             this.gameId = info.gameId
             this.tableId = info.tableId;
-            this.enterTable(info.host, info.port);
+            if(!this.enterTable(info.host, info.port)){
+                logger.error('已经在牌桌加入失败.');
+            }
             return;
         }
 
@@ -218,8 +221,11 @@ class Client{
 			}).then((data)=>{
 				this.host = data.host;
                 this.port = data.port;
-                ok = this.enterTable(this.host, this.port);
-			}).catch((err)=>{
+                return this.enterTable(this.host, this.port);
+            }).then((data)=>{
+                ok = data
+                logger.info('是否找到桌子 = ', ok);
+            }).catch((err)=>{
 				logger.warn(err);
 			})
 
@@ -238,25 +244,27 @@ class Client{
         let ok = false;
         this.pomelo.disconnect();
         this.pomelo = new pomeloClient();
+        await this.pomelo.init({ host: host, port: port, log: true, code:this.code }).then(()=>{
+            // 先注册游戏协议
+            this.enterGame(this.gameId);
 
-        await this.pomelo.init({ host: host, port: port, log: true, code:this.code });
-
-        let msg = {
-            openid: this.openid,
-            clubId: this.clubId,
-            playwayId: this.playwayId || '',
-            tableId: this.tableId || 0,
-        }
-        await this.pomelo.request("table.entryHandler.enter", msg, (data) => {
+            let msg = {
+                openid: this.openid,
+                clubId: this.clubId,
+                playwayId: this.playwayId || '',
+                tableId: this.tableId || 0,
+            }
+            return this.pomelo.request("table.entryHandler.enter", msg );
+        }).then((data)=>{
             if (data.code == 0) {
-                ok = true;
                 logger.info('%s加入牌桌成功.', this.code);
-                this.enterGame(this.gameId);
-                
+                ok = true;
             } else{
                 logger.warn('%s加入牌桌失败. data = %o', this.code, data);
             }
-        })
+        }).catch((err)=>{
+            logger.error(this.code+":enterTable err:"+err);
+        });
 
         return ok;
     }
@@ -264,8 +272,8 @@ class Client{
     async enterGame(gameId) {
         switch(gameId){
             case 15:
-                let game15 = new Game15(this);
-                await game15.mainLoop();
+                let game15 = new Game15(this);  //是否会内存泄漏?
+                await game15.init();
                 break;
             default:
                 logger.warn('no exist switch gameId[%d].', gameId);
