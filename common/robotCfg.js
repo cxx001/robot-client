@@ -1,10 +1,10 @@
 module.exports = {
 	257: [
-		{id: 1, name: '机器人1号', gender: 1, avatarUrl: 'http://sincebest-bull-test.oss-cn-hangzhou.aliyuncs.com/20180723_e852c0d11edf47529de8e7c69c848ca8.jpg'},
-		{id: 2, name: '机器人2号', gender: 1, avatarUrl: 'http://sincebest-bull-test.oss-cn-hangzhou.aliyuncs.com/20180719_e888a1bc8a19422da6e58b5ba3200930.jpg'},
-		{id: 3, name: '机器人3号', gender: 1, avatarUrl: 'http://sincebest-bull-test.oss-cn-hangzhou.aliyuncs.com/20180719_bfd5ba4ee9764df7a701f774d67987c7.jpg'},
-		{id: 4, name: '机器人4号', gender: 1, avatarUrl: 'http://sincebest-bull-test.oss-cn-hangzhou.aliyuncs.com/20180723_119275f89b33483299eeb8c311ef8653.jpg'},
-		{id: 5, name: '机器人5号', gender: 1, avatarUrl: 'http://sincebest-bull-test.oss-cn-hangzhou.aliyuncs.com/20180720_8ddaf196d64244ac9058e43f74f7b2ce.jpg'},
+		{id: 1, name: '机器人1号', gender: 1, avatarUrl: 'http://47.99.50.101:9999/head/avatar_1.png'},
+		{id: 2, name: '机器人2号', gender: 1, avatarUrl: 'http://47.99.50.101:9999/head/avatar_2.png'},
+		{id: 3, name: '机器人3号', gender: 1, avatarUrl: 'http://47.99.50.101:9999/head/avatar_3.png'},
+		{id: 4, name: '机器人4号', gender: 1, avatarUrl: 'http://47.99.50.101:9999/head/avatar_4.png'},
+		{id: 5, name: '机器人5号', gender: 1, avatarUrl: 'http://47.99.50.101:9999/head/avatar_5.png'},
 		{id: 6, name: '机器人6号', gender: 1, avatarUrl: 'http://47.99.50.101:9999/head/avatar_6.png'},
 		{id: 7, name: '机器人7号', gender: 1, avatarUrl: 'http://47.99.50.101:9999/head/avatar_7.png'},
 		{id: 8, name: '机器人8号', gender: 1, avatarUrl: 'http://47.99.50.101:9999/head/avatar_8.png'},
