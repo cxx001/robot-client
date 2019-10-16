@@ -261,6 +261,7 @@ class Client{
                 ok = true;
             } else{
                 logger.warn('%s加入牌桌失败. data = %o', this.code, data);
+                ok = false;
             }
         }).catch((err)=>{
             logger.error(this.code+":enterTable err:"+err);
