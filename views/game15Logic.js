@@ -1091,7 +1091,7 @@ exp.AISearchOutCard = function(handCardData, turnCardData, bNextWarn){
 	turnCardData = turnCardData || [];
 	let handCardCount = handCardData.length;
 	let turnCardCount = turnCardData.length;
-	pdkHelper.SortCardList(handCardData,handCardCount);
+	this.SortCardList(handCardData,handCardCount);
 	if (turnCardCount==0)
 	{
 		let OutCard = {
@@ -1105,15 +1105,15 @@ exp.AISearchOutCard = function(handCardData, turnCardData, bNextWarn){
 			cbCardCount: 0,		//扑克数目
 			cbResultCard: []	//结果扑克
 		};
-		let AnalyseResult = pdkHelper.AnalysebCardData(handCardData,handCardCount);
+		let AnalyseResult = this.AnalysebCardData(handCardData,handCardCount);
 		
 		//两手出牌，有 2 先出 2
-		if (pdkHelper.GetCardLogicValue(handCardData[0])==15
-			&&pdkHelper.GetCardType(handCardData,handCardCount)==CT_ERROR
+		if (this.GetCardLogicValue(handCardData[0])==15
+			&&this.GetCardType(handCardData,handCardCount)==exp.CardType.CT_ERROR
 			&&handCardCount>1)
 		{
 			let cbLeftCardData = handCardData.slice(1, handCardData.length);
-			if (pdkHelper.GetCardType(cbLeftCardData,handCardCount-1)!=CT_ERROR)
+			if (this.GetCardType(cbLeftCardData,handCardCount-1)!=exp.CardType.CT_ERROR)
 			{
 				OutCard.bCardData[0]=handCardData[0];
 				OutCard.bCardCount = 1;
@@ -1121,7 +1121,7 @@ exp.AISearchOutCard = function(handCardData, turnCardData, bNextWarn){
 			}
 		}
 		//最后三张牌，带2，所以出中间一个牌
-		if (pdkHelper.GetCardLogicValue(handCardData[0])==15 && handCardCount==3 && bNextWarn == false)
+		if (this.GetCardLogicValue(handCardData[0])==15 && handCardCount==3 && bNextWarn == false)
 		{
 			OutCard.bCardData[0]=handCardData[1];
 			OutCard.bCardCount = 1;
@@ -1132,12 +1132,12 @@ exp.AISearchOutCard = function(handCardData, turnCardData, bNextWarn){
 			//////**********************2011年6月7日 17:52:13*******************************////
 			//分析扑克
 			let SigneHand = [], SigneCount=0, bombVlue=0;
-			if(AnalyseResult.cbFourCount>0) bombVlue = pdkHelper.GetCardLogicValue(AnalyseResult.cbFourCardData[0]);
+			if(AnalyseResult.cbFourCount>0) bombVlue = this.GetCardLogicValue(AnalyseResult.cbFourCardData[0]);
 			//搜索连牌
 			for (let i=handCardCount-1;i>=5;i--)
 			{
 				//获取数值
-				let cbHandLogicValue=pdkHelper.GetCardLogicValue(handCardData[i]);
+				let cbHandLogicValue=this.GetCardLogicValue(handCardData[i]);
 				//构造判断
 				if (cbHandLogicValue>10)break;
 				if(IScanOut==true)break;
@@ -1145,9 +1145,9 @@ exp.AISearchOutCard = function(handCardData, turnCardData, bNextWarn){
 				let cbLineCount=0;
 				for (let j=i;j>=0;j--)
 				{
-					if ((pdkHelper.GetCardLogicValue(handCardData[j])-cbLineCount) ==cbHandLogicValue
-						&&bombVlue!=pdkHelper.GetCardLogicValue(handCardData[j])
-						&&pdkHelper.GetCardLogicValue(handCardData[j])<15) //不能拆炸弹
+					if ((this.GetCardLogicValue(handCardData[j])-cbLineCount) ==cbHandLogicValue
+						&&bombVlue!=this.GetCardLogicValue(handCardData[j])
+						&&this.GetCardLogicValue(handCardData[j])<15) //不能拆炸弹
 					{
 						//增加连数
 						SigneHand[cbLineCount++]=handCardData[j];
@@ -1165,7 +1165,7 @@ exp.AISearchOutCard = function(handCardData, turnCardData, bNextWarn){
 		///// 333 带 2
 		if(AnalyseResult.cbThreeCount>0&&handCardCount>=5&&IScanOut==false)
 		{
-			if(pdkHelper.GetCardLogicValue(AnalyseResult.cbThreeCardData[AnalyseResult.cbThreeCount*3-1])==3)
+			if(this.GetCardLogicValue(AnalyseResult.cbThreeCardData[AnalyseResult.cbThreeCount*3-1])==3)
 			{
 				if(AnalyseResult.cbSignedCount>=2) //优先带单牌
 				{
@@ -1196,23 +1196,23 @@ exp.AISearchOutCard = function(handCardData, turnCardData, bNextWarn){
 		{
 			TempTurnCard = [];
 			let bombVlue=0;
-			if(AnalyseResult.cbFourCount>0) bombVlue = pdkHelper.GetCardLogicValue(AnalyseResult.cbFourCardData[AnalyseResult.cbFourCount*4-1]);
+			if(AnalyseResult.cbFourCount>0) bombVlue = this.GetCardLogicValue(AnalyseResult.cbFourCardData[AnalyseResult.cbFourCount*4-1]);
 			TempTurnCard[0] =0x03;
 			TempTurnCard[1] =0x03;
 			TempTurnCard[2] =0x03;
 			TempTurnCard[3] =0x04;
 			TempTurnCard[4] =0x05;
 			TempTurnCount = 5;
-			if (pdkHelper.SearchOutCard(handCardData,handCardCount,TempTurnCard,TempTurnCount,OutCardResult)==true)
+			if (this.SearchOutCard(handCardData,handCardCount,TempTurnCard,TempTurnCount,OutCardResult)==true)
 			{
 				if (OutCardResult.cbCardCount==5)
 				{
 					//开始打JJJ以上 带二 不允许
-					if(pdkHelper.GetCardLogicValue(OutCardResult.cbResultCard[0])>11&&handCardCount>10)
+					if(this.GetCardLogicValue(OutCardResult.cbResultCard[0])>11&&handCardCount>10)
 					{
 						IScanOut = false;
 					}
-					else if(pdkHelper.GetCardLogicValue(OutCardResult.cbResultCard[0])!=bombVlue)///炸弹不能拆
+					else if(this.GetCardLogicValue(OutCardResult.cbResultCard[0])!=bombVlue)///炸弹不能拆
 					{
 						OutCard.bCardData = OutCardResult.cbResultCard.slice(0);
 						OutCard.bCardCount = OutCardResult.cbCardCount;
@@ -1226,15 +1226,15 @@ exp.AISearchOutCard = function(handCardData, turnCardData, bNextWarn){
 			if(AnalyseResult.cbDoubleCount>1)
 			{
 				//获取数值
-				let  cbHandLogicValue=pdkHelper.GetCardLogicValue(AnalyseResult.cbDoubleCardData[AnalyseResult.cbDoubleCount*2-1]);
+				let  cbHandLogicValue=this.GetCardLogicValue(AnalyseResult.cbDoubleCardData[AnalyseResult.cbDoubleCount*2-1]);
 				//搜索连牌
 				let cbLineCount=0;
 				let DoubleHand = [];
 				let Index = AnalyseResult.cbDoubleCount*2-1;
 				do
 				{
-					if (((pdkHelper.GetCardLogicValue(AnalyseResult.cbDoubleCardData[Index])-cbLineCount)==cbHandLogicValue)
-						&&((pdkHelper.GetCardLogicValue(AnalyseResult.cbDoubleCardData[Index-1])-cbLineCount)==cbHandLogicValue))
+					if (((this.GetCardLogicValue(AnalyseResult.cbDoubleCardData[Index])-cbLineCount)==cbHandLogicValue)
+						&&((this.GetCardLogicValue(AnalyseResult.cbDoubleCardData[Index-1])-cbLineCount)==cbHandLogicValue))
 					{
 						//增加连数
 						DoubleHand[cbLineCount*2]=AnalyseResult.cbDoubleCardData[Index];
@@ -1255,11 +1255,11 @@ exp.AISearchOutCard = function(handCardData, turnCardData, bNextWarn){
 		if (IScanOut==false)
 		{
 			let FirstLogV;
-			FirstLogV = pdkHelper.GetCardLogicValue(handCardData[handCardCount-1]);
+			FirstLogV = this.GetCardLogicValue(handCardData[handCardCount-1]);
 			wSameCardNum = 0;
 			for(let i=0;i<handCardCount;i++)
 			{
-				if (FirstLogV== pdkHelper.GetCardLogicValue(handCardData[handCardCount-1-i]))
+				if (FirstLogV== this.GetCardLogicValue(handCardData[handCardCount-1-i]))
 					OutCard.bCardData[wSameCardNum++]= handCardData[handCardCount-1-i];
 				else break;
 			}
@@ -1281,7 +1281,7 @@ exp.AISearchOutCard = function(handCardData, turnCardData, bNextWarn){
 				cbCardCount: 0,		//扑克数目
 				cbResultCard: []	//结果扑克
 			};
-			if (pdkHelper.SearchOutCard(handCardData,handCardCount,TempTurnCard,TempTurnCount,OutCardResult)==true)
+			if (this.SearchOutCard(handCardData,handCardCount,TempTurnCard,TempTurnCount,OutCardResult)==true)
 			{
 				OutCard.bCardData = OutCardResult.cbResultCard.slice(0);
 				OutCard.bCardCount = OutCardResult.cbCardCount;
@@ -1293,7 +1293,7 @@ exp.AISearchOutCard = function(handCardData, turnCardData, bNextWarn){
 			}
 		}
 		//一次出完 
-		if (pdkHelper.GetCardType(handCardData,handCardCount)!=CT_ERROR)
+		if (this.GetCardType(handCardData,handCardCount)!=exp.CardType.CT_ERROR)
 		{
 			if (handCardCount<=6&&AnalyseResult.cbFourCount>0)
 			{
@@ -1323,7 +1323,7 @@ exp.AISearchOutCard = function(handCardData, turnCardData, bNextWarn){
 		// 		wSameCardNum = 0;
 		// 		for(let i=0;i<handCardCount;i++)
 		// 		{
-		// 			if (0x03 == pdkHelper.GetCardLogicValue(handCardData[handCardCount-1-i]))
+		// 			if (0x03 == this.GetCardLogicValue(handCardData[handCardCount-1-i]))
 		// 				OutCard.bCardData[wSameCardNum++]= handCardData[handCardCount-1-i];
 		// 			else break;
 		// 		}
@@ -1341,25 +1341,25 @@ exp.AISearchOutCard = function(handCardData, turnCardData, bNextWarn){
 	else
 	{
 		//获取类型
-		let cbTurnOutType=pdkHelper.GetCardType(turnCardData,turnCardCount);
-		let AnalyseResult = pdkHelper.AnalysebCardData(handCardData,handCardCount);
+		let cbTurnOutType=this.GetCardType(turnCardData,turnCardCount);
+		let AnalyseResult = this.AnalysebCardData(handCardData,handCardCount);
 		let OutCardResult = {
 			cbCardCount: 0,		//扑克数目
 			cbResultCard: []	//结果扑克
 		};
-		if (pdkHelper.SearchOutCard(handCardData,handCardCount,turnCardData,turnCardCount,OutCardResult)==true)
+		if (this.SearchOutCard(handCardData,handCardCount,turnCardData,turnCardCount,OutCardResult)==true)
 		{
 			let OutCard = {
 				bCardCount: 0,				//出牌数目
 				bCardData: [],				//扑克列表
 				wOutCardUser: 0             //出牌玩家
 			};
-			if(AnalyseResult.cbFourCount>0&&cbTurnOutType!=CT_BOMB_CARD)
+			if(AnalyseResult.cbFourCount>0&&cbTurnOutType!=exp.CardType.CT_BOMB_CARD)
 			{    //****************如果把炸弹拆了，强制出炸弹***********************
 				for(let i=0;i<OutCardResult.cbCardCount;i++)
 				{
-					if (pdkHelper.GetCardLogicValue(OutCardResult.cbResultCard[i])
-						==pdkHelper.GetCardLogicValue(AnalyseResult.cbFourCardData[0]))
+					if (this.GetCardLogicValue(OutCardResult.cbResultCard[i])
+						==this.GetCardLogicValue(AnalyseResult.cbFourCardData[0]))
 					{
 						OutCard.bCardData = AnalyseResult.cbFourCardData.slice(0);
 						OutCard.bCardCount = 4;
@@ -1374,13 +1374,13 @@ exp.AISearchOutCard = function(handCardData, turnCardData, bNextWarn){
 			//下家报警，单牌出最大
 			if (bNextWarn==true&&OutCard.bCardCount==1)
 			{
-				OutCard.bCardData[0] = pdkHelper.GetHandMaxCard(handCardData,handCardCount);
+				OutCard.bCardData[0] = this.GetHandMaxCard(handCardData,handCardCount);
 				OutCard.bCardCount = 1;
 			}
 			else if (OutCard.bCardCount==1&&handCardCount>1)
 			{
-				pdkHelper.SortCardList(handCardData,handCardCount);
-				if (pdkHelper.GetCardLogicValue(handCardData[1])>pdkHelper.GetCardLogicValue(turnCardData[0]))
+				this.SortCardList(handCardData,handCardCount);
+				if (this.GetCardLogicValue(handCardData[1])>this.GetCardLogicValue(turnCardData[0]))
 				{
 					OutCard.bCardData[0] = handCardData[1];
 					OutCard.bCardCount = 1;
