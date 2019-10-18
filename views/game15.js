@@ -41,11 +41,6 @@ class Game15{
 
 	onSendParameter(data){
 		this.tableCfg = data;
-		if (this.tableCfg.gameParameter.b15Or16 == 0) {
-			Game15Logic.setMaxHandCardCount(15);
-		} else {
-			Game15Logic.setMaxHandCardCount(16);
-		}
 	}
 
 	async onSendGameScene(data){
