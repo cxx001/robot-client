@@ -1,5 +1,5 @@
 module.exports = {
-	257: [
+	974: [
 		{id: 1, name: '机器人1号', gender: 1, avatarUrl: 'http://47.99.50.101:8000/head/avatar_1.png'},
 		{id: 2, name: '机器人2号', gender: 1, avatarUrl: 'http://47.99.50.101:8000/head/avatar_2.png'},
 		{id: 3, name: '机器人3号', gender: 1, avatarUrl: 'http://47.99.50.101:8000/head/avatar_3.png'},

@@ -17,7 +17,6 @@ var CardData = [
 //数值掩码
 var MASK_COLOR = 0xF0	//花色掩码
 var MASK_VALUE = 0x0F	//数值掩码
-var MaxCardCount = 15;
 
 //扑克类型
 exp.CardType = {
@@ -32,6 +31,14 @@ exp.CardType = {
 	CT_BOMB_CARD: 8 					//炸弹类型
 };
 
+// 设置最大手牌数量
+exp.setMaxHandCardCount = function (max) {
+	this.maxCardCount = max;
+}
+
+exp.getMaxHandCardCount = function () {
+	return this.maxCardCount;
+}
 
 //混乱扑克
 exp.RandCardList = function ()
@@ -68,7 +75,7 @@ exp.SortCardList = function(cbCardData, cbCardCount)
 		for (let i=0;i<cbLast;i++)
 		{
 			//20131022
-			if(i>=MaxCardCount-1)
+			if(i>=this.getMaxHandCardCount()-1)
 			{
 				bSorted = false;
 				break;
@@ -677,7 +684,7 @@ exp.RemoveCard = function(cbRemoveCard, cbRemoveCount, cbCardData, cbCardCount)
 	//定义变量
 	let cbDeleteCount=0;
 	let cbTempCardData = [];
-	if (cbCardCount > MaxCardCount) return false;
+	if (cbCardCount > this.getMaxHandCardCount()) return false;
 	cbTempCardData = cbCardData.slice(0);
 
 	//置零扑克

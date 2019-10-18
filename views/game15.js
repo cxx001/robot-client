@@ -41,6 +41,11 @@ class Game15{
 
 	onSendParameter(data){
 		this.tableCfg = data;
+		if (this.tableCfg.gameParameter.b15Or16 == 0) {
+			Game15Logic.setMaxHandCardCount(15);
+		} else {
+			Game15Logic.setMaxHandCardCount(16);
+		}
 	}
 
 	async onSendGameScene(data){
@@ -111,8 +116,8 @@ class Game15{
 		if (data.outcardUser == this.myChairID) {
 			if(Game15Logic.RemoveCard(data.cardData,data.cardCount,this.cbCardData,this.bCardCount) == false)
 			{
-				logger.info(data.cardData,data.cardCount,this.cbCardData,this.bCardCount);
-				logger.error('用户[%s]出牌删除失败.', this.userData.name);
+				logger.error('用户[%s]出牌删除失败:', this.userData.name, data.cardData,data.cardCount,this.cbCardData,this.bCardCount);
+				process.exit(1);
 				return;
 			}
 		}

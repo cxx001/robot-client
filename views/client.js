@@ -6,8 +6,8 @@ let UserData = require('../dataMgr/userData');
 let RobotCfg = require('../common/robotCfg');
 let Game15 = require('./game15');
 
-// const C_HOST =  '127.0.0.1';
-const C_HOST =  '47.99.50.101';
+const C_HOST =  '127.0.0.1';
+// const C_HOST =  '47.99.50.101';
 const C_PORT = 8686;
 
 class Client{
