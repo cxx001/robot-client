@@ -136,6 +136,40 @@ class Client{
         logger.info('------------enter _handleMaintainState');
     }
 
+    // 是否钱够
+    _checkIsCanMoney(playwayCfg) {
+        let self = this;
+        let isCan = false;
+        return new Promise(function (resolve, reject) {
+            if (playwayCfg.gameMode == 0) {
+                // 金币厅
+                let coin = self.loginData.coin;
+                let lowerLimit = playwayCfg.lowerLimit;
+                let upperLimit = playwayCfg.upperLimit;
+                if (upperLimit == 0) {
+                    if (coin >= lowerLimit) {
+                        isCan = true;
+                    }
+                } else {
+                    if (coin >= lowerLimit && coin <= upperLimit) {
+                        isCan = true;
+                    }
+                }
+                if (!isCan) {
+                    logger.warn('玩家[%s]金币不够.', this.code);
+                }
+                resolve(isCan);
+            }
+            else {
+                // 积分厅
+                if (!isCan) {
+                    logger.warn('玩家[%s]积分不够.', this.code);
+                }
+                resolve(isCan);
+            }
+        })
+    }
+
     async enterClub() {
         this.pomelo.request('connector.clubHandler.enterClub', {clubId: this.clubId}).then((data)=>{
 			if (data.code == 0) {
@@ -179,18 +213,21 @@ class Client{
 
 		let ok = false;
         while(true) {
-			// 获取现有桌子
-			await this.pomelo.request('connector.clubHandler.getClubTable', {clubId: this.clubId}).then((data)=> {
+            // 获取现有桌子
+            let gameMode = this.robotCfg.gameMode;
+            let gameId = this.robotCfg.gameId;
+            let playwayId = this.robotCfg.playwayId;
+			await this.pomelo.request('connector.clubHandler.getClubTable', {clubId: this.clubId, gameMode: gameMode, gameId: gameId, playwayId: playwayId}).then((data)=> {
 				if (data.code != 0) {
 					throw '获取俱乐部已创桌子失败!';
 				}
                
 				let tableInfos = data.tableInfos;
 				let tempTables = [];
-				let playwayId = this.robotCfg.playwayId;
 				for (let i = 0; i < tableInfos.length; i++) {
-					const table = tableInfos[i];
-					if ((playwayId == 0 || playwayId == table.playwayId) && table.players.length < table.chairCount) {
+                    const table = tableInfos[i];
+                    let isCan = await this._checkIsCanMoney(table);
+                    if (isCan && table.players.length < table.chairCount) {
 						tempTables.push(table);
 					}
 				}
@@ -204,9 +241,7 @@ class Client{
 				}
 
 				// 创建桌子，获取玩法
-				let gameMode = this.robotCfg.gameMode;
-				let gameId = this.robotCfg.gameId;
-				return this.pomelo.request('connector.clubHandler.getClubPlayway', {clubId: this.clubId, gameMode: gameMode, gameId: gameId});
+				return this.pomelo.request('connector.clubHandler.getClubPlayway', {clubId: this.clubId, gameMode: gameMode, gameId: gameId, playwayId: playwayId});
 			}).then((data)=> {
 				if (data.tableId) {
 					// 加入桌子
@@ -223,10 +258,10 @@ class Client{
 					}
 
 					let tempPlayway = [];
-					let playwayId = this.robotCfg.playwayId;
 					for (let i = 0; i < playways.length; i++) {
-						const playway = playways[i];
-						if (playwayId == 0 || playwayId == playway.id) {
+                        const playway = playways[i];
+                        let isCan = await this._checkIsCanMoney(playway);
+						if (isCan) {
 							tempPlayway.push(playway);
 						}
 					}
@@ -239,7 +274,7 @@ class Client{
 						return this.pomelo.request('connector.lobbyHandler.getGameServerInfo', {gameId: randPlayway.gameId});
 					}
 
-					logger.warn('俱乐部[%d]不存在玩法[%s].', this.clubId, playwayId);
+					logger.warn('俱乐部[%d]不存在玩法[gameMode:%d gameId:%d playwayId:%s].', this.clubId, this.robotCfg.gameMode, this.robotCfg.gameId, this.robotCfg.playwayId);
 					throw '请先设置对应玩法.'
 				}
 			}).then((data)=>{
@@ -256,8 +291,9 @@ class Client{
 			if( ok ){
                 break;
             }else{
-                logger.info('重新循环查找桌子')
-                await utils.sleep(3*1000);
+                logger.info('重新循环查找桌子');
+                let time = utils.randomInt(3000, 10 * 1000);
+                await utils.sleep(time);
                 this.pomelo.disconnect();
                 await this.createConnect();
             }

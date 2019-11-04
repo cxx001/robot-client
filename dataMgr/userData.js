@@ -12,10 +12,9 @@ class UserData{
 		this.name = userInfo.name;
 		this.gender = userInfo.gender;
 		this.avatarUrl = userInfo.avatarUrl;
-		this.money = userInfo.money;
+		this.coin = userInfo.coin;
 		this.createTime = userInfo.createTime;
 		this.lastOfflineTime = userInfo.lastOfflineTime;
-		this.createTime = userInfo.createTime;
 		this.gameInfo = userInfo.gameInfo;
 		
         if (this.bInited)
