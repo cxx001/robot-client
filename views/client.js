@@ -137,7 +137,7 @@ class Client{
     }
 
     // 是否钱够
-    _checkIsCanMoney(playwayCfg) {
+     _checkIsCanMoney(playwayCfg) {
         let self = this;
         let isCan = false;
         return new Promise(function (resolve, reject) {
@@ -156,14 +156,14 @@ class Client{
                     }
                 }
                 if (!isCan) {
-                    logger.warn('玩家[%s]金币不够.', this.code);
+                    logger.warn('玩家[%s]金币不够.', self.code);
                 }
                 resolve(isCan);
             }
             else {
                 // 积分厅
                 if (!isCan) {
-                    logger.warn('玩家[%s]积分不够.', this.code);
+                    logger.warn('玩家[%s]积分不够.', self.code);
                 }
                 resolve(isCan);
             }
@@ -226,7 +226,7 @@ class Client{
 				let tempTables = [];
 				for (let i = 0; i < tableInfos.length; i++) {
                     const table = tableInfos[i];
-                    let isCan = await this._checkIsCanMoney(table);
+                    let isCan = this._checkIsCanMoney(table);
                     if (isCan && table.players.length < table.chairCount) {
 						tempTables.push(table);
 					}
@@ -260,7 +260,7 @@ class Client{
 					let tempPlayway = [];
 					for (let i = 0; i < playways.length; i++) {
                         const playway = playways[i];
-                        let isCan = await this._checkIsCanMoney(playway);
+                        let isCan = this._checkIsCanMoney(playway);
 						if (isCan) {
 							tempPlayway.push(playway);
 						}
@@ -274,6 +274,8 @@ class Client{
 						return this.pomelo.request('connector.lobbyHandler.getGameServerInfo', {gameId: randPlayway.gameId});
 					}
 
+                    ok = true;
+                    this.pomelo.disconnect();
 					logger.warn('俱乐部[%d]不存在玩法[gameMode:%d gameId:%d playwayId:%s].', this.clubId, this.robotCfg.gameMode, this.robotCfg.gameId, this.robotCfg.playwayId);
 					throw '请先设置对应玩法.'
 				}

@@ -70,8 +70,7 @@ class Game15{
 					// 资金不足
 					this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
 						if (data.code == 0 || data.code == 3) {
-							logger.info('资金不足已退出.')
-							this.pomelo.disconnect();
+							logger.info('资金不足离开房间.')
 						} else {
 							logger.error('离开游戏错误 code:', data.code);
 						}
@@ -164,8 +163,7 @@ class Game15{
 				// 资金不足
 				this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
 					if (data.code == 0 || data.code == 3) {
-						logger.info('资金不足已退出')
-						this.pomelo.disconnect();
+						logger.info('资金不足离开房间.')
 					} else {
 						logger.error('离开游戏错误 code=', data.code);
 					}
