@@ -198,6 +198,7 @@ class Client{
 				if (tempTables.length > 0) {
 					let randTable = lodash.sample(tempTables);
 					logger.info('加入桌子 table = ', randTable);
+					this.gameId = randTable.gameId;
 					this.tableId = randTable.tableId;
 					return randTable;
 				}
@@ -235,7 +236,7 @@ class Client{
 						this.gameId = randPlayway.gameId;
 						this.playwayId = randPlayway.id;
 						logger.info('创建桌子 table = ', randPlayway);
-						return this.pomelo.request('connector.lobbyHandler.enterTable', {gameId: randPlayway.gameId});
+						return this.pomelo.request('connector.lobbyHandler.getGameServerInfo', {gameId: randPlayway.gameId});
 					}
 
 					logger.warn('俱乐部[%d]不存在玩法[%s].', this.clubId, playwayId);
@@ -294,6 +295,7 @@ class Client{
     }
 
     async enterGame(gameId) {
+		gameId = Number(gameId);
         switch(gameId){
             case 15:
                 let game15 = new Game15(this);  //是否会内存泄漏?

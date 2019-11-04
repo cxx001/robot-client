@@ -66,6 +66,19 @@ class Game15{
 			await this.pomelo.request('table.tableHandler.readyGame', {}, (data) => {
 				if (data.code == 0 || data.code == 1) {
 					this._startLeaveSchedule();
+				} else if(data.code == 4) {
+					// 资金不足
+					this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
+						if (data.code == 0 || data.code == 3) {
+							logger.info('资金不足已退出.')
+							this.pomelo.disconnect();
+						} else {
+							logger.error('离开游戏错误 code:', data.code);
+						}
+					})
+				} else {
+					// 其它错误
+					logger.warn('[table.tableHandler.readyGame] code = %d', data.code);
 				}
 			})
 		}
@@ -144,11 +157,20 @@ class Game15{
 		await this.pomelo.request('table.tableHandler.readyGame', {}, (data) => {
 			if (data.code == 0) {
 				this._startLeaveSchedule();
-			}
-			else if(data.code == 3) {
+			} else if(data.code == 3) {
 				//大结算
 				this.client.mainLoop();
-			} else{
+			} else if(data.code == 4) {
+				// 资金不足
+				this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
+					if (data.code == 0 || data.code == 3) {
+						logger.info('资金不足已退出')
+						this.pomelo.disconnect();
+					} else {
+						logger.error('离开游戏错误 code=', data.code);
+					}
+				})
+			} else {
 				this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
 					// 离开游戏
 					if (data.code == 0 || data.code == 3) {
