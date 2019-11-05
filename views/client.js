@@ -1,4 +1,4 @@
-﻿let logger = require('../util/logger').getLogger();
+﻿let loggerEx = require('../util/loggerEx');
 let pomeloClient = require('../net/pomelo-client');
 let utils = require('../util/utils');
 let lodash = require('lodash');
@@ -30,6 +30,7 @@ class Client{
 		}
         this.loginData = null; 
 		this.userData = null;
+		this.logger = null;
 		this.gameId = null;
 		this.tableId = null;
 		this.robotCfg = null;
@@ -39,9 +40,11 @@ class Client{
 		this.reset();
 		
 		// 登入大厅
+		this.logger = new loggerEx();
         await this.createConnect();
         this.userData = new UserData();
-        this.userData.init(this.pomelo, this.loginData);
+		this.userData.init(this.pomelo, this.loginData);
+		this.logger.init(this.loginData);
 		await utils.sleep(1000);
 		
 		// 进入俱乐部
@@ -102,7 +105,7 @@ class Client{
                     throw null;
                 }                                                                                 
             }).catch((err)=>{
-                logger.error(this.code+":createConnect err:"+err);
+                this.logger.error(this.code+":createConnect err:"+err);
             });
 
             if( ok ){
@@ -129,11 +132,11 @@ class Client{
     }
 
     _onLoginFailed(){
-		logger.info('------------enter _onLoginFailed');
+		this.logger.info('------------enter _onLoginFailed');
     }
 
     _handleMaintainState(){
-        logger.info('------------enter _handleMaintainState');
+        this.logger.info('------------enter _handleMaintainState');
     }
 
     // 是否钱够
@@ -155,16 +158,10 @@ class Client{
                         isCan = true;
                     }
                 }
-                if (!isCan) {
-                    logger.warn('玩家[%s]金币不够.', self.code);
-                }
                 resolve(isCan);
             }
             else {
                 // 积分厅
-                if (!isCan) {
-                    logger.warn('玩家[%s]积分不够.', self.code);
-                }
                 resolve(isCan);
             }
         })
@@ -179,14 +176,14 @@ class Client{
 				// 玩家不在俱乐部
 				this.pomelo.request('connector.clubHandler.joinClubByCode', {invateCode: this.invateCode}).then((data)=>{
 					if (data.code != 0) {
-						logger.error('join club error:', data);
+						this.logger.error('join club error:', data);
 						this.pomelo.disconnect();
 						return;
 					}
 					this.findTable()
 				});
 			} else{
-				logger.error('enter club error:', data);
+				this.logger.error('enter club error:', data);
 				this.pomelo.disconnect();
 				return;
 			}
@@ -202,11 +199,11 @@ class Client{
         let gameInfo = this.loginData.gameInfo;
         if (gameInfo.code == 1) {
             let info = gameInfo.gameInfo;
-            logger.info('%s已经在牌桌. gameInfo = %o', this.code, info);
+            this.logger.info('已经在牌桌 gameInfo = %o', info);
             this.gameId = info.gameId;
             this.tableId = info.tableId;
             if(!this.enterTable(info.host, info.port)){
-                logger.error('已经在牌桌加入失败.');
+                this.logger.error('已经在牌桌加入失败.');
             }
             return;
         }
@@ -234,7 +231,7 @@ class Client{
 
 				if (tempTables.length > 0) {
 					let randTable = lodash.sample(tempTables);
-					logger.info('加入桌子 table = ', randTable);
+					this.logger.info('加入桌子 table = ', randTable);
 					this.gameId = randTable.gameId;
 					this.tableId = randTable.tableId;
 					return randTable;
@@ -253,8 +250,8 @@ class Client{
 					}
 					let playways = data.playways;
 					if (playways.length <= 0) {
-						logger.info('俱乐部[%d]还没有设置玩法.', this.clubId);
-						throw '请先设置俱乐部玩法.'
+						this.logger.warn('俱乐部[%d]没有玩法[gameMode:%d gameId:%d playwayId:%s].', this.clubId, this.robotCfg.gameMode, this.robotCfg.gameId, this.robotCfg.playwayId);
+						throw '请先设置对应玩法.'
 					}
 
 					let tempPlayway = [];
@@ -270,13 +267,13 @@ class Client{
 						let randPlayway = lodash.sample(tempPlayway);
 						this.gameId = randPlayway.gameId;
 						this.playwayId = randPlayway.id;
-						logger.info('创建桌子 table = ', randPlayway);
+						this.logger.info('创建桌子 table = ', randPlayway);
 						return this.pomelo.request('connector.lobbyHandler.getGameServerInfo', {gameId: randPlayway.gameId});
 					}
 
                     ok = true;
                     this.pomelo.disconnect();
-					logger.warn('俱乐部[%d]不存在玩法[gameMode:%d gameId:%d playwayId:%s].', this.clubId, this.robotCfg.gameMode, this.robotCfg.gameId, this.robotCfg.playwayId);
+					this.logger.warn('俱乐部[%d]不存在玩法[gameMode:%d gameId:%d playwayId:%s].', this.clubId, this.robotCfg.gameMode, this.robotCfg.gameId, this.robotCfg.playwayId);
 					throw '请先设置对应玩法.'
 				}
 			}).then((data)=>{
@@ -285,15 +282,15 @@ class Client{
                 return this.enterTable(this.host, this.port);
             }).then((data)=>{
                 ok = data
-                logger.info('是否找到桌子 = ', ok);
+                this.logger.info('是否找到桌子 = ', ok);
             }).catch((err)=>{
-				logger.warn(err);
+				this.logger.warn(err);
 			})
 
 			if( ok ){
                 break;
             }else{
-                logger.info('重新循环查找桌子');
+                this.logger.info('重新循环查找桌子');
                 let time = utils.randomInt(3000, 10 * 1000);
                 await utils.sleep(time);
                 this.pomelo.disconnect();
@@ -319,14 +316,14 @@ class Client{
             return this.pomelo.request("table.entryHandler.enter", msg );
         }).then((data)=>{
             if (data.code == 0) {
-                logger.info('%s加入牌桌成功.', this.code);
+                this.logger.info('加入牌桌成功.');
                 ok = true;
             } else{
-                logger.warn('%s加入牌桌失败. data = %o', this.code, data);
+                this.logger.warn('加入牌桌失败. data = %o', data);
                 ok = false;
             }
         }).catch((err)=>{
-            logger.error(this.code+":enterTable err:"+err);
+            this.logger.error("enterTable err:"+err);
         });
 
         return ok;
@@ -340,7 +337,7 @@ class Client{
                 await game15.init();
                 break;
             default:
-                logger.warn('no exist switch gameId[%d].', gameId);
+                this.logger.warn('no exist switch gameId[%d].', gameId);
                 this.pomelo.disconnect();
         }
     }

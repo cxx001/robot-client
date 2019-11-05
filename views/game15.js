@@ -1,4 +1,3 @@
-let logger = require('../util/logger').getLogger();
 let utils = require('../util/utils')
 let Game15Logic = require('./game15Logic');
 
@@ -7,12 +6,13 @@ class Game15{
         this.client = client ;
         this.pomelo = client.pomelo ;
 		this.userData = client.userData;
+		this.logger = client.logger;
 		this._initNetEvent();
 		this.reset();
 	}
 
 	async init(){
-		logger.info('-----------游戏模块初始化:%d-----------', this.client.gameId);
+		this.logger.info('-----------游戏模块初始化:%d-----------', this.client.gameId);
 	}
 
 	reset() {
@@ -68,16 +68,18 @@ class Game15{
 					this._startLeaveSchedule();
 				} else if(data.code == 4) {
 					// 资金不足
+					this.logger.info('资金不足离开房间.');
 					this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
+						// 离开游戏
 						if (data.code == 0 || data.code == 3) {
-							logger.info('资金不足离开房间.')
-						} else {
-							logger.error('离开游戏错误 code:', data.code);
+							this.client.mainLoop();
+						} else{
+							this.logger.error('离开游戏错误 code:', data.code);
 						}
 					})
 				} else {
 					// 其它错误
-					logger.warn('[table.tableHandler.readyGame] code = %d', data.code);
+					this.logger.warn('准备游戏错误:code = %d', data.code);
 				}
 			})
 		}
@@ -115,7 +117,7 @@ class Game15{
 
 	onOutCard(data){
 		if (!this.cbCardData) {
-			logger.error('[%d] onOutCard is handcard error.', this.userData.name);
+			this.logger.error('onOutCard is handcard error.');
 			return;
 		}
 
@@ -123,7 +125,7 @@ class Game15{
 		if (data.outcardUser == this.myChairID) {
 			if(Game15Logic.RemoveCard(data.cardData,data.cardCount,this.cbCardData,this.bCardCount) == false)
 			{
-				logger.error('用户[%s]出牌删除失败:', this.userData.name, data.cardData,data.cardCount,this.cbCardData,this.bCardCount);
+				this.logger.error('出牌删除失败:', data.cardData,data.cardCount,this.cbCardData,this.bCardCount);
 				process.exit(1);
 				return;
 			}
@@ -161,22 +163,17 @@ class Game15{
 				this.client.mainLoop();
 			} else if(data.code == 4) {
 				// 资金不足
-				this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
-					if (data.code == 0 || data.code == 3) {
-						logger.info('资金不足离开房间.')
-					} else {
-						logger.error('离开游戏错误 code=', data.code);
-					}
-				})
-			} else {
+				this.logger.info('资金不足离开房间.');
 				this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
 					// 离开游戏
 					if (data.code == 0 || data.code == 3) {
 						this.client.mainLoop();
 					} else{
-						logger.warn('用户[%s]离开房间失败!', this.userData.name)
+						this.logger.error('离开游戏错误 code:', data.code);
 					}
 				})
+			} else {
+				this.logger.warn('准备游戏错误:code = %d', data.code);
 			}
 		})
 	}
@@ -210,13 +207,13 @@ class Game15{
 					bCardData: OutCard.bCardData,
 					bCardCount: OutCard.bCardCount
 				}
-				logger.info('用户[%s] 出牌:%o', this.userData.name, msg)
+				this.logger.info('出牌:%o', msg);
 				lower = lower || 2000;
 				upper = upper || 4000;
 				await utils.sleep(utils.randomInt(lower, upper));
 				await this.pomelo.request('table.tableHandler.playCard', msg, (data) => {});
 			} else {
-				logger.info("要不起[%s]", this.userData.name);
+				this.logger.info("要不起.");
 			}
 		}
 	}
