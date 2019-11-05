@@ -155,6 +155,7 @@ class PomeloClient extends EventEmitter{
         }
     };
     async disconnect(cb){
+		logger.info(this.code + ' disconnect.')
         if( cb === undefined ){
             let p0 =  new Promise( (resolve, reject)=>{ 
                 let callback = (data)=>{
