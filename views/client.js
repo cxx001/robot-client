@@ -141,30 +141,26 @@ class Client{
 
     // 是否钱够
      _checkIsCanMoney(playwayCfg) {
-        let self = this;
-        let isCan = false;
-        return new Promise(function (resolve, reject) {
-            if (playwayCfg.gameMode == 0) {
-                // 金币厅
-                let coin = self.loginData.coin;
-                let lowerLimit = playwayCfg.lowerLimit;
-                let upperLimit = playwayCfg.upperLimit;
-                if (upperLimit == 0) {
-                    if (coin >= lowerLimit) {
-                        isCan = true;
-                    }
-                } else {
-                    if (coin >= lowerLimit && coin <= upperLimit) {
-                        isCan = true;
-                    }
-                }
-                resolve(isCan);
-            }
-            else {
-                // 积分厅
-                resolve(isCan);
-            }
-        })
+		let isCan = false;
+		if (playwayCfg.gameMode == 0) {
+			// 金币厅
+			let coin = this.loginData.coin;
+			let lowerLimit = playwayCfg.lowerLimit;
+			let upperLimit = playwayCfg.upperLimit;
+			if (upperLimit == 0) {
+				if (coin >= lowerLimit) {
+					isCan = true;
+				}
+			} else {
+				if (coin >= lowerLimit && coin <= upperLimit) {
+					isCan = true;
+				}
+			}
+		}
+		else {
+			// 积分厅
+		}
+		return isCan;
     }
 
     async enterClub() {
@@ -250,7 +246,7 @@ class Client{
 					}
 					let playways = data.playways;
 					if (playways.length <= 0) {
-						this.logger.warn('俱乐部[%d]没有玩法[gameMode:%d gameId:%d playwayId:%s].', this.clubId, this.robotCfg.gameMode, this.robotCfg.gameId, this.robotCfg.playwayId);
+						this.logger.warn('没有满足条件玩法:[clubId:%d gameMode:%d gameId:%d playwayId:%s].', this.clubId, this.robotCfg.gameMode, this.robotCfg.gameId, this.robotCfg.playwayId);
 						throw '请先设置对应玩法.'
 					}
 
@@ -271,10 +267,10 @@ class Client{
 						return this.pomelo.request('connector.lobbyHandler.getGameServerInfo', {gameId: randPlayway.gameId});
 					}
 
-                    ok = true;
+					this.logger.warn('资金不足:[clubId:%d gameMode:%d gameId:%d playwayId:%s].', this.clubId, this.robotCfg.gameMode, this.robotCfg.gameId, this.robotCfg.playwayId);
+					ok = true;
                     this.pomelo.disconnect();
-					this.logger.warn('俱乐部[%d]不存在玩法[gameMode:%d gameId:%d playwayId:%s].', this.clubId, this.robotCfg.gameMode, this.robotCfg.gameId, this.robotCfg.playwayId);
-					throw '请先设置对应玩法.'
+					throw '资金不足请先充值.'
 				}
 			}).then((data)=>{
 				this.host = data.host;
