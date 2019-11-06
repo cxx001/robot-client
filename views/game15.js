@@ -37,7 +37,7 @@ class Game15{
 		this.pomelo.on('onOutCard',this.onOutCard.bind(this));
 		this.pomelo.on('onPassCard',this.onPassCard.bind(this));
 		this.pomelo.on('onSettlement',this.onSettlement.bind(this));
-		this.pomelo.on('onDissolveTable', this.onDissolveTable.bind(this));
+		this.pomelo.on('onDissolveRoom', this.onDissolveRoom.bind(this));
 	}
 
 	onSendParameter(data){
@@ -179,14 +179,9 @@ class Game15{
 		})
 	}
 
-	async onDissolveTable(data) {
-		if (data.code == 0) {
-			this.logger.info('桌子被管理员解散.');
-			await utils.sleep(1000);
-			this.client.mainLoop();
-		} else{
-			this.logger.warn('解散桌子失败.code=', data.code);
-		}
+	async onDissolveRoom(data) {
+		this.logger.info('俱乐部[%d]中桌子[%d]已经回收.', data.clubId, data.tableId);
+		this.client.mainLoop();
 	}
 
 	_startLeaveSchedule() {
