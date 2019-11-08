@@ -127,7 +127,6 @@ class Game15{
 			if(Game15Logic.RemoveCard(data.cardData,data.cardCount,this.cbCardData,this.bCardCount) == false)
 			{
 				this.logger.error('出牌删除失败:', data.cardData,data.cardCount,this.cbCardData,this.bCardCount);
-				process.exit(1);
 				return;
 			}
 		}
