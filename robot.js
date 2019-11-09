@@ -9,7 +9,6 @@ process.on('uncaughtException',
 	async function (err) {
 		logger2.fatal("uncaughtException:", err);
 		logger2.fatal(err.stack);
-		process.exit(0);
 	}
 );
 
@@ -17,7 +16,6 @@ process.on('unhandledRejection',
 	async function (err) {
 		logger2.fatal("unhandledRejection:", err);
 		logger2.fatal(err.stack);
-		process.exit(0);
 	}
 );
 

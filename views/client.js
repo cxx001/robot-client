@@ -111,7 +111,7 @@ class Client{
             if( ok ){
                 break;
             }else{
-                await utils.sleep(3*1000);
+                await utils.sleep(3000);
             }
         }
     }
@@ -188,7 +188,7 @@ class Client{
 	
 	async findTable() {
 		// TODO:暂时简单处理，随机延时加入
-		let time = utils.randomInt(2000, 15 * 1000);
+		let time = utils.randomInt(1000, 30 * 1000);
         await utils.sleep(time);
         
         // 是否已经在牌桌里了
@@ -287,8 +287,7 @@ class Client{
                 break;
             }else{
                 this.logger.info('重新循环查找桌子');
-                let time = utils.randomInt(3000, 10 * 1000);
-                await utils.sleep(time);
+                await utils.sleep(3000);
                 this.pomelo.disconnect();
                 await this.createConnect();
             }

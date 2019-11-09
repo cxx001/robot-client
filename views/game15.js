@@ -185,7 +185,7 @@ class Game15{
 
 	_startLeaveSchedule() {
 		this._stopLeaveSchedule();
-		let dt = utils.randomInt(10 * 1000, 20 * 1000);
+		let dt = 60 * 1000;
 		this.leaveSchedule = setTimeout(() => {
 			this.leaveSchedule = null;
 			this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
