@@ -1,6 +1,7 @@
 'use strict';
 var log4js = require('log4js');
 var logDir = 'logs'+100 ;
+var curTime = new Date().toLocaleString();
 
 log4js.configure({
     appenders: {
@@ -8,13 +9,9 @@ log4js.configure({
             type: "console"
         },
         rule_file: {
-            type: "dateFile",
-            filename: __dirname + '/../'+logDir+'/debug/log-',
-            encoding: "utf-8",
+            type: "file",
+            filename: __dirname + '/../'+logDir+'/debug/log-'+curTime+'.log',
             maxLogSize: 1048576,
-            //numBackups: 3,
-            pattern: "yyyy-MM-dd.log",
-			alwaysIncludePattern: true,
 			backups: 5,
         },
         rule_mark: {
