@@ -8,7 +8,7 @@ log4js.configure({
             type: "console"
         },
         rule_file: {
-            type: "file",
+            type: "dateFile",
             filename: __dirname + '/../'+logDir+'/debug/log-',
             encoding: "utf-8",
             maxLogSize: 1048576,
@@ -18,7 +18,7 @@ log4js.configure({
 			backups: 5,
         },
         rule_mark: {
-            type: "file",
+            type: "dateFile",
             filename: __dirname + '/../'+logDir+'/debug/a_mark-',
             encoding: "utf-8",
             maxLogSize: 1048576,
