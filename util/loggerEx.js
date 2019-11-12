@@ -27,8 +27,8 @@ class loggerEx{
 	}
 
 	init(opts) {
-		let name = opts.name || '未知名字';
-		this.prefix = "[" + name + "] ";
+		let openid = opts.openid || '未知';
+		this.prefix = "[" + openid + "] ";
 	};
 
 	log() {
