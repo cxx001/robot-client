@@ -8,13 +8,11 @@ log4js.configure({
             type: "console"
         },
         rule_file: {
-            type: "dateFile",
-            filename: __dirname + '/../'+logDir+'/debug/log-',
+            type: "file",
+            filename: __dirname + '/../'+logDir+'/debug/robot_client.log',
             encoding: "utf-8",
             maxLogSize: 1048576,
-            numBackups: 100,
-            pattern: "yyyy-MM-dd.log",
-            alwaysIncludePattern: true
+			backups: 100,
         },
         rule_mark: {
             type: "dateFile",
