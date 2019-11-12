@@ -9,10 +9,10 @@ log4js.configure({
         },
         rule_file: {
             type: "file",
-            filename: __dirname + '/../'+logDir+'/debug/robot_client.log',
+            filename: __dirname + '/../'+logDir+'/debug/robot_client_log',
             encoding: "utf-8",
-            maxLogSize: 1048576,
-			numBackups: 100,
+            maxLogSize: 10485760,
+			numBackups: 500,
         },
         rule_mark: {
             type: "dateFile",
