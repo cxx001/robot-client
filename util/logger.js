@@ -12,7 +12,7 @@ log4js.configure({
             filename: __dirname + '/../'+logDir+'/debug/robot_client.log',
             encoding: "utf-8",
             maxLogSize: 1048576,
-			backups: 100,
+			numBackups: 100,
         },
         rule_mark: {
             type: "dateFile",
