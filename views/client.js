@@ -143,18 +143,11 @@ class Client{
      _checkIsCanMoney(playwayCfg) {
 		let isCan = false;
 		if (playwayCfg.gameMode == 0) {
-			// 金币厅
-			let coin = this.loginData.coin;
+			// 普通厅
+			let gold = this.loginData.gold;
 			let lowerLimit = playwayCfg.lowerLimit;
-			let upperLimit = playwayCfg.upperLimit;
-			if (upperLimit == 0) {
-				if (coin >= lowerLimit) {
-					isCan = true;
-				}
-			} else {
-				if (coin >= lowerLimit && coin <= upperLimit) {
-					isCan = true;
-				}
+			if (gold >= lowerLimit) {
+				isCan = true;
 			}
 		}
 		else {

@@ -4,7 +4,7 @@
  * playwayId: "0" 所有玩法 其它对应玩法ID
  *  */ 
 module.exports = {
-	257: [
+	751: [
 		{id: 1, name: '刘佳宇', gender: 1, avatarUrl: 'http://47.99.50.101:8000/head/avatar_1.png', gameMode: 0, gameId: 0, playwayId: "0"},
 		{id: 2, name: '阳光沙滩', gender: 1, avatarUrl: 'http://47.99.50.101:8000/head/avatar_2.png', gameMode: 0, gameId: 0, playwayId: "0"},
 		{id: 3, name: '指尖上的温柔', gender: 1, avatarUrl: 'http://47.99.50.101:8000/head/avatar_3.png', gameMode: 0, gameId: 0, playwayId: "0"},
