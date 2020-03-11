@@ -37,12 +37,12 @@ class Game25{
 	}
 
 	async onSendGameScene(data){
+		this.myChairID = data.wChairID;
 		if (data.gameStatus == 2) {
 			// 已经开始游戏
 			this.handCardData = data.handCardData;
 			this.stuCompareCard = data.stuCompareCard;
 			this.wBankerUser = data.bankerUser;
-
 		} else {
 			// 准备界面
 			await utils.sleep(utils.randomInt(2000, 4000));
@@ -51,18 +51,14 @@ class Game25{
 					this._startLeaveSchedule();
 				} else if(data.code == 3) {
 					// 资金不足
-					this.logger.info('资金不足离开房间.');
+					this.logger.warn('资金不足!');
 					this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
 						// 离开游戏
-						if (data.code == 0 || data.code == 3) {
-							this.client.mainLoop();
-						} else{
-							this.logger.error('离开游戏错误 code:', data.code);
-						}
+						this.logger.info('资金不足离开房间. code=', data.code);
 					})
 				} else {
 					// 其它错误
-					this.logger.warn('准备游戏错误:code = %d', data.code);
+					this.logger.warn('准备游戏异常:code = %d', data.code);
 				}
 			})
 		}
@@ -71,13 +67,20 @@ class Game25{
 	onUserEntryRoom(data){
 		if (this.userData.uid == data.id) {
 			this.myChairID = data.chairID;
-			if (this.myChairID == 0) {
-				this._startGameSchedule();
-			}
 		}
 	}
 
 	async onStartGame(data){
+		if (!data.wChairID || data.wChairID == 65535) {
+			// 旁观玩家
+			this.pomelo.request('table.tableHandler.lookPlayerSeat', {}, (data) => {
+				if (data.code != 0) {
+					this.logger.warn('入座失败:code=', data.code);
+					this.client.mainLoop();
+				}
+			})
+			return;
+		}
 		this.logger.info(data.cbCardData, data.wChairID);
 		this._stopLeaveSchedule();
 		this._stopGameSchedule();
@@ -93,7 +96,7 @@ class Game25{
 
 	async onConfirmBanker(data) {
 		this.wBankerUser = data.wBankerUser;
-		if (this.wBankerUser != this.myChairID) {
+		if (this.wBankerUser != this.myChairID && !this.isHalfJoin()) {
 			// 闲家下注
 			await utils.sleep(utils.randomInt(1000, 3000));
 			let bBetting = this.stuCompareCard.cbFanBei;
@@ -103,12 +106,16 @@ class Game25{
 
 	async onSendLastCard(data) {
 		// 明牌阶段
+		if (this.isHalfJoin()) {
+			return;
+		}
 		await utils.sleep(utils.randomInt(2000, 5000));
 		await this.pomelo.request('table.tableHandler.showCard', {}, (data) => {})
 	}
 
 	async onSettlement(data){
 		this.logger.info('结算:', data);
+		this.reset();
 		await utils.sleep(utils.randomInt(2000, 5000));
 		await this.pomelo.request('table.tableHandler.readyGame', {}, (data) => {
 			if (data.code == 0) {
@@ -118,14 +125,10 @@ class Game25{
 				this.client.mainLoop();
 			} else if(data.code == 3) {
 				// 资金不足
-				this.logger.info('资金不足离开房间.');
+				this.logger.warn('资金不足!');
 				this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
 					// 离开游戏
-					if (data.code == 0 || data.code == 3) {
-						this.client.mainLoop();
-					} else{
-						this.logger.error('离开游戏错误 code:', data.code);
-					}
+					this.logger.info('资金不足离开房间. code=', data.code);
 				})
 			} else {
 				this.logger.warn('准备游戏错误:code = %d', data.code);
@@ -167,7 +170,7 @@ class Game25{
 
 	_startGameSchedule() {
 		this._stopGameSchedule();
-		let dt = 15 * 1000;
+		let dt = 10 * 1000;
 		this.startSchedule = setTimeout(() => {
 			this.startSchedule = null;
 			this.pomelo.request('table.tableHandler.handStartGame', {}, (data) => {
@@ -190,6 +193,14 @@ class Game25{
 			this.startSchedule = null;
 		}
 	};
+
+	isHalfJoin() {
+		if (this.handCardData && this.handCardData.length == 5) {
+			return false;
+		}
+		this.logger.info('中途加入.');
+		return true;
+	}
 };
 
 module.exports = Game25;
