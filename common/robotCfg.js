@@ -4,17 +4,17 @@
  * playwayId: "0" 所有玩法 其它对应玩法ID
  *  */ 
 module.exports = {
-	698: [
-		{id: 1, name: '刘佳宇', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_1.png', gameMode: 0, gameId: 0, playwayId: "0"},
-		{id: 2, name: '阳光沙滩', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_2.png', gameMode: 0, gameId: 0, playwayId: "0"},
-		{id: 3, name: '指尖上的温柔', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_3.png', gameMode: 0, gameId: 0, playwayId: "0"},
-		{id: 4, name: '海燕子', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_4.png', gameMode: 0, gameId: 0, playwayId: "0"},
-		{id: 5, name: '往事不可回首', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_5.png', gameMode: 0, gameId: 0, playwayId: "0"},
-		{id: 6, name: '重庆石锅鱼', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_6.png', gameMode: 0, gameId: 0, playwayId: "0"},
-		{id: 7, name: '猛虎上山', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_7.png', gameMode: 0, gameId: 0, playwayId: "0"},
-		{id: 8, name: '飞飞驾到', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_8.png', gameMode: 0, gameId: 0, playwayId: "0"},
-		{id: 9, name: '水中月', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_9.png', gameMode: 0, gameId: 0, playwayId: "0"},
-		{id: 10, name: '赵小青', gender: 0, avatarUrl: 'http://111.229.200.111:8000/head/avatar_10.png', gameMode: 0, gameId: 0, playwayId: "0"},
+	751: [
+		{id: 1, name: '刘佳宇', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_1.png', gameMode: 0, gameId: 25, playwayId: "0"},
+		{id: 2, name: '阳光沙滩', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_2.png', gameMode: 0, gameId: 25, playwayId: "0"},
+		{id: 3, name: '指尖上的温柔', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_3.png', gameMode: 0, gameId: 25, playwayId: "0"},
+		{id: 4, name: '海燕子', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_4.png', gameMode: 0, gameId: 25, playwayId: "0"},
+		{id: 5, name: '往事不可回首', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_5.png', gameMode: 0, gameId: 25, playwayId: "0"},
+		{id: 6, name: '重庆石锅鱼', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_6.png', gameMode: 0, gameId: 25, playwayId: "0"},
+		{id: 7, name: '猛虎上山', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_7.png', gameMode: 0, gameId: 25, playwayId: "0"},
+		{id: 8, name: '飞飞驾到', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_8.png', gameMode: 0, gameId: 25, playwayId: "0"},
+		{id: 9, name: '水中月', gender: 1, avatarUrl: 'http://111.229.200.111:8000/head/avatar_9.png', gameMode: 0, gameId: 25, playwayId: "0"},
+		{id: 10, name: '赵小青', gender: 0, avatarUrl: 'http://111.229.200.111:8000/head/avatar_10.png', gameMode: 0, gameId: 25, playwayId: "0"},
 		{id: 11, name: '彭扬芳', gender: 0, avatarUrl: 'http://111.229.200.111:8000/head/avatar_11.png', gameMode: 0, gameId: 0, playwayId: "0"},
 		{id: 12, name: '蒋亮', gender: 0, avatarUrl: 'http://111.229.200.111:8000/head/avatar_12.png', gameMode: 0, gameId: 0, playwayId: "0"},
 		{id: 13, name: '邓军', gender: 0, avatarUrl: 'http://111.229.200.111:8000/head/avatar_13.png', gameMode: 0, gameId: 0, playwayId: "0"},

@@ -11,10 +11,6 @@ class Game15{
 		this.reset();
 	}
 
-	async init(){
-		this.logger.info('-----------游戏模块初始化:%d-----------', this.client.gameId);
-	}
-
 	reset() {
 		this.tableCfg = null;
 		this.leaveSchedule = null;
@@ -67,7 +63,7 @@ class Game15{
 			await this.pomelo.request('table.tableHandler.readyGame', {}, (data) => {
 				if (data.code == 0 || data.code == 1) {
 					this._startLeaveSchedule();
-				} else if(data.code == 4) {
+				} else if(data.code == 3) {
 					// 资金不足
 					this.logger.info('资金不足离开房间.');
 					this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
@@ -158,10 +154,10 @@ class Game15{
 		await this.pomelo.request('table.tableHandler.readyGame', {}, (data) => {
 			if (data.code == 0) {
 				this._startLeaveSchedule();
-			} else if(data.code == 3) {
+			} else if(data.code == 2 || data.code == 401) {
 				//大结算
 				this.client.mainLoop();
-			} else if(data.code == 4) {
+			} else if(data.code == 3) {
 				// 资金不足
 				this.logger.info('资金不足离开房间.');
 				this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {

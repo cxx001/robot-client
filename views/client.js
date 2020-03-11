@@ -4,7 +4,9 @@ let utils = require('../util/utils');
 let lodash = require('lodash');
 let UserData = require('../dataMgr/userData');
 let RobotCfg = require('../common/robotCfg');
+
 let Game15 = require('./game15');
+let Game25 = require('./game25');
 
 const C_HOST =  '127.0.0.1';
 // const C_HOST =  '47.99.50.101';
@@ -321,9 +323,11 @@ class Client{
 		gameId = Number(gameId);
         switch(gameId){
             case 15:
-                let game15 = new Game15(this);  //是否会内存泄漏?
-                await game15.init();
-                break;
+                new Game15(this);
+				break;
+			case 25:
+				new Game25(this);
+				break;
             default:
                 this.logger.warn('no exist switch gameId[%d].', gameId);
                 this.pomelo.disconnect();
