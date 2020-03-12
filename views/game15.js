@@ -11,10 +11,8 @@ class Game15{
 		this.reset();
 	}
 
-	reset() {
-		this.tableCfg = null;
-		this.leaveSchedule = null;
-		this.myChairID = null;
+	reset(isContinue) {
+		this._stopLeaveSchedule();
 		this.wCurrentUser = null;
 		this.cbCardData = null;
 		this.bCardCount = null;
@@ -22,6 +20,10 @@ class Game15{
 		this.turnCardCount = null;
 		this.bNextWarn = null;
 		this.outcardUser = null;
+		if (!isContinue) {
+			this.tableCfg = null;
+			this.myChairID = null;
+		}
 	}
 
 	_initNetEvent() {
@@ -65,18 +67,14 @@ class Game15{
 					this._startLeaveSchedule();
 				} else if(data.code == 3) {
 					// 资金不足
-					this.logger.info('资金不足离开房间.');
+					this.logger.warn('资金不足!');
 					this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
 						// 离开游戏
-						if (data.code == 0 || data.code == 3) {
-							this.client.mainLoop();
-						} else{
-							this.logger.error('离开游戏错误 code:', data.code);
-						}
+						this.logger.info('资金不足离开房间. code=', data.code);
 					})
 				} else {
 					// 其它错误
-					this.logger.warn('准备游戏错误:code = %d', data.code);
+					this.logger.warn('准备游戏异常:code = %d', data.code);
 				}
 			})
 		}
@@ -150,6 +148,7 @@ class Game15{
 	}
 
 	async onSettlement(data){
+		this.reset(true);
 		await utils.sleep(utils.randomInt(2000, 6000));
 		await this.pomelo.request('table.tableHandler.readyGame', {}, (data) => {
 			if (data.code == 0) {
@@ -159,14 +158,10 @@ class Game15{
 				this.client.mainLoop();
 			} else if(data.code == 3) {
 				// 资金不足
-				this.logger.info('资金不足离开房间.');
+				this.logger.warn('资金不足!');
 				this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
 					// 离开游戏
-					if (data.code == 0 || data.code == 3) {
-						this.client.mainLoop();
-					} else{
-						this.logger.error('离开游戏错误 code:', data.code);
-					}
+					this.logger.info('资金不足离开房间. code=', data.code);
 				})
 			} else {
 				this.logger.warn('准备游戏错误:code = %d', data.code);
@@ -188,6 +183,8 @@ class Game15{
 				// 离开游戏
 				if (data.code == 0 || data.code == 3) {
 					this.client.mainLoop();
+				} else {
+					this.logger.error('离开游戏错误!');
 				}
 			})
 		}, dt);
