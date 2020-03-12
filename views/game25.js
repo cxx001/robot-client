@@ -11,14 +11,16 @@ class Game25{
 		this.reset();
 	}
 
-	reset() {
+	reset(isContinue) {
 		this._stopLeaveSchedule();
 		this._stopGameSchedule();
-		this.tableCfg = null;
-		this.myChairID = null;
 		this.handCardData = null;
 		this.stuCompareCard = null;
 		this.wBankerUser = null;
+		if (!isContinue) {
+			this.tableCfg = null;
+			this.myChairID = null;
+		}
 	}
 
 	_initNetEvent() {
@@ -29,6 +31,7 @@ class Game25{
 		this.pomelo.on('onConfirmBanker', this.onConfirmBanker.bind(this));
 		this.pomelo.on('onSendLastCard', this.onSendLastCard.bind(this));
 		this.pomelo.on('onSettlement',this.onSettlement.bind(this));
+		this.pomelo.on('onLeaveRoom', this.onLeaveRoom.bind(this));
 		this.pomelo.on('onDissolveRoom', this.onDissolveRoom.bind(this));
 	}
 
@@ -71,12 +74,16 @@ class Game25{
 	}
 
 	async onStartGame(data){
-		if (!data.wChairID || data.wChairID == 65535) {
-			// 旁观玩家
-			this.pomelo.request('table.tableHandler.lookPlayerSeat', {}, (data) => {
+		if (data.wChairID != 0 && (!data.wChairID || data.wChairID == 65535)) {
+			this.logger.info('旁观玩家.');
+			await utils.sleep(1000);
+			// 旁观玩家入座
+			await this.pomelo.request('table.tableHandler.lookPlayerSeat', {}, (data) => {
 				if (data.code != 0) {
 					this.logger.warn('入座失败:code=', data.code);
 					this.client.mainLoop();
+				} else {
+					this.logger.info('入座成功.');
 				}
 			})
 			return;
@@ -115,7 +122,7 @@ class Game25{
 
 	async onSettlement(data){
 		this.logger.info('结算:', data);
-		this.reset();
+		this.reset(true);
 		await utils.sleep(utils.randomInt(2000, 5000));
 		await this.pomelo.request('table.tableHandler.readyGame', {}, (data) => {
 			if (data.code == 0) {
@@ -134,6 +141,13 @@ class Game25{
 				this.logger.warn('准备游戏错误:code = %d', data.code);
 			}
 		})
+	}
+
+	async onLeaveRoom(data) {
+		if (data.wChairID == this.myChairID) {
+			this.logger.info('玩家离开房间.');
+			this.client.mainLoop();
+		}
 	}
 
 	async onDissolveRoom(data) {
@@ -198,7 +212,7 @@ class Game25{
 		if (this.handCardData && this.handCardData.length == 5) {
 			return false;
 		}
-		this.logger.info('中途加入.');
+		this.logger.info('当前旁观.');
 		return true;
 	}
 };
