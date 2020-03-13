@@ -32,7 +32,7 @@ class Game25{
 		this.pomelo.on('onSendLastCard', this.onSendLastCard.bind(this));
 		this.pomelo.on('onSettlement',this.onSettlement.bind(this));
 		this.pomelo.on('onLeaveRoom', this.onLeaveRoom.bind(this));
-		this.pomelo.on('onDissolveRoom', this.onDissolveRoom.bind(this));
+		this.pomelo.on('onBigSettleGame', this.onBigSettleGame.bind(this));
 	}
 
 	onSendParameter(data){
@@ -127,9 +127,6 @@ class Game25{
 		await this.pomelo.request('table.tableHandler.readyGame', {}, (data) => {
 			if (data.code == 0) {
 				this._startLeaveSchedule();
-			} else if(data.code == 2 || data.code == 401) {
-				//大结算
-				this.client.mainLoop();
 			} else if(data.code == 3) {
 				// 资金不足
 				this.logger.warn('资金不足!');
@@ -150,8 +147,8 @@ class Game25{
 		}
 	}
 
-	async onDissolveRoom(data) {
-		this.logger.info('俱乐部[%d]中桌子[%d]已经回收.', data.clubId, data.tableId);
+	async onBigSettleGame(data) {
+		this.logger.info('大结算:', data);
 		this.client.mainLoop();
 	}
 
@@ -166,12 +163,7 @@ class Game25{
 		let dt = 60 * 1000;
 		this.leaveSchedule = setTimeout(() => {
 			this.leaveSchedule = null;
-			this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {
-				// 离开游戏
-				if (data.code == 0 || data.code == 3) {
-					this.client.mainLoop();
-				}
-			})
+			this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {})
 		}, dt);
 	};
 

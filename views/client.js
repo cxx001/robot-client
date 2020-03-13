@@ -215,7 +215,7 @@ class Client{
 				for (let i = 0; i < tableInfos.length; i++) {
                     const table = tableInfos[i];
                     let isCan = this._checkIsCanMoney(table);
-                    if (isCan && table.players.length < table.chairCount) {
+                    if (isCan && table.players.length < table.chairCount && table.gameStatus != 2) {
 						tempTables.push(table);
 					}
 				}

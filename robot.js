@@ -36,3 +36,6 @@ let run = async function(){
 	}
 }
 run();
+
+
+// new Client('robot_2', 75135820, 2);
