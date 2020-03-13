@@ -37,10 +37,14 @@ pro.NuiType = {
 	NiuType_8: 8,			//牛8
 	NiuType_9: 9,			//牛9
 	NiuType_Niu: 10,		//牛牛
-	NiuType_Silver: 20,		//四花牛
-	NiuType_Gold: 30,		//五花牛	
+	NiuType_Silver: 20,		//银牛
+	NiuType_Straight: 25,	//顺子牛
+	NiuType_Gold: 28,		//五花牛	
+	NiuType_SameColor: 30,	//同花牛
+	NiuType_Gourd: 40,		//葫芦牛
 	NiuType_Bomb: 50,		//炸弹牛
 	NiuType_Niu5: 60,		//五小牛
+	NiuType_Flush: 70,		//(快乐牛)同花顺
 };
 
 //混乱扑克
@@ -131,6 +135,38 @@ pro.AnalysebCardData = function(cbHandCardData)
 	}
 
 	let isHaveNiu = false;
+	//同花顺
+	if (isHaveNiu == false)
+	{
+		let cbCardDataTemp = cbHandCardData.slice(0);	//扑克
+		for (let i = 0; i < 5; i++)
+		{
+			for (let j = i+1; j < 5; j++)
+			{
+				if ((cbCardDataTemp[j]&0x0F) > (cbCardDataTemp[i]&0x0F))
+				{
+					let cbData = cbCardDataTemp[i];
+					cbCardDataTemp[i] = cbCardDataTemp[j];
+					cbCardDataTemp[j] = cbData;
+				}
+			}
+		}
+		isHaveNiu = true;
+		for (let i = 0; i < 5; i++)
+		{
+			if (i > 0 && ((cbCardDataTemp[i]&0xF0) != (cbCardDataTemp[i-1]&0xF0) || (cbCardDataTemp[i]&0x0F)+1 != (cbCardDataTemp[i-1]&0x0F)))
+			{
+				isHaveNiu = false;
+				break;
+			}
+		}
+		if (isHaveNiu)
+		{
+			cbValueType = pro.NuiType.NiuType_Flush;
+		}
+	}
+
+
 	if (isHaveNiu == false) {
 		//五小牛
 		let cbFiveValue = 0;
@@ -173,6 +209,33 @@ pro.AnalysebCardData = function(cbHandCardData)
 		}
 	}
 
+	//葫芦牛
+	if (isHaveNiu == false)
+	{
+		let bCardIndex = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+		for (let j = 0; j < 5; j++)
+		{
+			bCardIndex[(cbCardData[j]&0x0F)]++;
+		}
+		let cbCardValue2 = 0;
+		let cbCardValue3 = 0;
+		for (let j = 0; j < 20; j++)
+		{
+			if (bCardIndex[j] == 3)
+			{
+				cbCardValue3 = j;
+			}else if (bCardIndex[j] == 2)
+			{
+				cbCardValue2 = j;
+			}
+		}
+		if (cbCardValue2 != 0 && cbCardValue3 != 0)
+		{
+			cbValueType = pro.NuiType.NiuType_Gourd;
+			isHaveNiu = true;
+		}
+	}
+
 	if (isHaveNiu == false)
 	{
 		for (let j = 0; j < 5; j++)
@@ -201,11 +264,11 @@ pro.AnalysebCardData = function(cbHandCardData)
 						{
 							if ((cbCardData[0]&0x0F)>10 && (cbCardData[1]&0x0F)>10 && (cbCardData[2]&0x0F)>10 && (cbCardData[3]&0x0F)>10 && (cbCardData[4]&0x0F)>10)
 							{
-								//金花牛
+								//五花牛
 								cbValueType = pro.NuiType.NiuType_Gold;
 							}else if ((cbCardData[0]&0x0F)>=10 && (cbCardData[1]&0x0F)>=10 && (cbCardData[2]&0x0F)>=10 && (cbCardData[3]&0x0F)>=10 && (cbCardData[4]&0x0F)>=10)
 							{
-								//银花牛
+								//银牛
 								cbValueType = pro.NuiType.NiuType_Silver;
 							}else
 							{
@@ -222,7 +285,71 @@ pro.AnalysebCardData = function(cbHandCardData)
 			if (isHaveNiu)break;
 		}
 	}
-	
+
+	// 同花牛
+	if (cbValueType < pro.NuiType.NiuType_SameColor)
+	{
+		let cbCardDataTemp = cbHandCardData.slice(0);	//扑克
+		for (let i = 0; i < 5; i++)
+		{
+			for (let j = i+1; j < 5; j++)
+			{
+				if ((cbCardDataTemp[j]&0x0F) > (cbCardDataTemp[i]&0x0F))
+				{
+					let cbData = cbCardDataTemp[i];
+					cbCardDataTemp[i] = cbCardDataTemp[j];
+					cbCardDataTemp[j] = cbData;
+				}
+			}
+		}
+		for (let i = 0; i < 5; i++)
+		{
+			if (i > 0 && (cbCardDataTemp[i]&0xF0) == (cbCardDataTemp[i-1]&0xF0))
+			{
+				if (i == 5 -1)
+				{
+					cbValueType = pro.NuiType.NiuType_SameColor;
+					isHaveNiu = true;
+				}				
+			}else if (i != 0)
+			{
+				break;
+			}
+		}
+	}
+
+	// 顺子牛
+	if (cbValueType < pro.NuiType.NiuType_Straight)
+	{
+		let cbCardDataTemp = cbHandCardData.slice(0);	//扑克
+		for (let i = 0; i < 5; i++)
+		{
+			for (let j = i+1; j < 5; j++)
+			{
+				if ((cbCardDataTemp[j]&0x0F) > (cbCardDataTemp[i]&0x0F))
+				{
+					let cbData = cbCardDataTemp[i];
+					cbCardDataTemp[i] = cbCardDataTemp[j];
+					cbCardDataTemp[j] = cbData;
+				}
+			}
+		}
+		for (let i = 0; i < 5; i++)
+		{
+			if (i > 0 && (cbCardDataTemp[i]&0x0F)+1 == (cbCardDataTemp[i-1]&0x0F))
+			{
+				if (i == 5 -1)
+				{
+					cbValueType = pro.NuiType.NiuType_Straight;
+					isHaveNiu = true;
+				}	
+			}else if (i != 0)
+			{
+				break;
+			}
+		}
+	}
+
 	let stuCompareCard = {}
 	stuCompareCard.cbCardData = cbHandCardData;
 	stuCompareCard.cbValueType = cbValueType;
@@ -235,13 +362,19 @@ pro.AnalysebCardData = function(cbHandCardData)
 pro.GetFanBei = function(cbValueType)
 {
 	let bMultiple = 1;
-	if (cbValueType >= pro.NuiType.NiuType_Silver) {
+	if (cbValueType >= pro.NuiType.NiuType_Niu5) {
+		bMultiple = 8;
+	} else if (cbValueType >= pro.NuiType.NiuType_Gourd) {
+		bMultiple = 6;
+	} else if(cbValueType >= pro.NuiType.NiuType_Straight) {
+		bMultiple = 5;
+	} else if(cbValueType >= pro.NuiType.NiuType_Niu) {
 		bMultiple = 4;
-	} else if (cbValueType == pro.NuiType.NiuType_Niu) {
+	} else if(cbValueType >= pro.NuiType.NiuType_9) {
 		bMultiple = 3;
-	} else if(cbValueType >= pro.NuiType.NiuType_7) {
+	}else if(cbValueType >= pro.NuiType.NiuType_7) {
 		bMultiple = 2;
-	} else {
+	}else {
 		bMultiple = 1;
 	}
 	return bMultiple;

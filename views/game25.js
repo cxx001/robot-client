@@ -97,7 +97,7 @@ class Game25{
 		this.logger.info('手牌信息:', this.stuCompareCard);
 		// 抢庄
 		await utils.sleep(utils.randomInt(1000, 3000));
-		let bMultiple = this.stuCompareCard.cbFanBei - 1;
+		let bMultiple = this.getPullMultiple(this.stuCompareCard.cbValueType);
 		await this.pomelo.request('table.tableHandler.grabBanker', {bMultiple: bMultiple}, (data) => {})
 	}
 
@@ -106,7 +106,7 @@ class Game25{
 		if (this.wBankerUser != this.myChairID && !this.isHalfJoin()) {
 			// 闲家下注
 			await utils.sleep(utils.randomInt(1000, 3000));
-			let bBetting = this.stuCompareCard.cbFanBei;
+			let bBetting = this.getPullMultiple(this.stuCompareCard.cbValueType) + 1;
 			await this.pomelo.request('table.tableHandler.betting', {bBetting: bBetting}, (data) => {})
 		}
 	}
@@ -206,6 +206,18 @@ class Game25{
 		}
 		this.logger.info('当前旁观.');
 		return true;
+	}
+
+	getPullMultiple(cbValueType) {
+		let multiple = 0;
+		if (cbValueType >= Game25Logic.NuiType.NiuType_Gourd) {
+			multiple = 3;
+		} else if(cbValueType >= Game25Logic.NuiType.NiuType_Niu) {
+			multiple = 2;
+		} else if(cbValueType >= Game25Logic.NuiType.NiuType_7) {
+			multiple = 1;
+		}
+		return multiple;
 	}
 };
 
