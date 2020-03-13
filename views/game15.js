@@ -174,7 +174,8 @@ class Game15{
 			const user = dissolveData[i];
 			if (user.id == this.userData.uid) {
 				if (user.dissolveState == 3) {
-					this.pomelo.request('table.tableHandler.dissolveGame', {dissolveType: 2}, (data) => {});
+					await utils.sleep(utils.randomInt(2000, 8000));
+					await this.pomelo.request('table.tableHandler.dissolveGame', {dissolveType: 2}, (data) => {});
 				}
 				break;
 			}
