@@ -14,9 +14,9 @@ const C_PORT = 8686;
 
 class Client{
     constructor(openid, clubId, index){
-        this.clubId = clubId;
+        this.clubId = Number(clubId);
         this.index = index;
-        let user = this._getUserInfo();
+        let user = this._getRobotInfo();
         if (!user) {
             console.log('机器人配置错误!');
             return;
@@ -84,7 +84,7 @@ class Client{
                 return pomelo.init({ host: this.host, port: this.port, log: true, code:this.code } ) ;
             }).then(()=>{
 				//login
-				let userInfo = this._getUserInfo();
+				let userInfo = this._getRobotInfo();
 				if (!userInfo) {
 					this._onLoginFailed();
                     throw 'robot config no exist.';
@@ -128,17 +128,13 @@ class Client{
         }
     }
 
-    _getUserInfo(){
+    _getRobotInfo(){
 		let robotInfos = RobotCfg[this.clubId];
 		let info = null;
 		if (robotInfos && robotInfos[this.index-1]) {
 			let robotData = robotInfos[this.index-1];
 			this.robotCfg = robotData;
-			info = {
-				name: robotData.name,
-				gender: robotData.gender,
-				avatarUrl: robotData.avatarUrl
-			}
+			info = robotData;
 		}
         return info;
     }
