@@ -13,20 +13,25 @@ const C_HOST =  '127.0.0.1';
 const C_PORT = 8686;
 
 class Client{
-    constructor(openid, index){
+    constructor(openid, clubId, index){
+        this.clubId = clubId;
         this.index = index;
         let user = this._getUserInfo();
         if (!user) {
-            loggerEx.error('机器人配置错误!');
+            console.log('机器人配置错误!');
             return;
         }
         this.invateCode = user.invateCode;
-		let clubId = Number(String(this.invateCode).substring(0, 3));
+        let clubId = Number(String(this.invateCode).substring(0, 3));
+        if (clubId != this.clubId) {
+            console.log('俱乐部ID错误!');
+            return;
+        }
+
         this.host = C_HOST;
         this.port = C_PORT;      
         this.code = openid;
 		this.openid = openid;
-		this.clubId = clubId;
         this.mainLoop();
     }
 
