@@ -9,19 +9,24 @@ let Game15 = require('./game15');
 let Game25 = require('./game25');
 
 const C_HOST =  '127.0.0.1';
-// const C_HOST =  '47.99.50.101';
+//const C_HOST =  '111.229.200.111';
 const C_PORT = 8686;
 
 class Client{
-    constructor(openid, invateCode, index){
-		let clubId = Number(String(invateCode).substring(0, 3));
+    constructor(openid, index){
+        this.index = index;
+        let user = this._getUserInfo();
+        if (!user) {
+            loggerEx.error('机器人配置错误!');
+            return;
+        }
+        this.invateCode = user.invateCode;
+		let clubId = Number(String(this.invateCode).substring(0, 3));
         this.host = C_HOST;
         this.port = C_PORT;      
         this.code = openid;
 		this.openid = openid;
 		this.clubId = clubId;
-		this.invateCode = invateCode;
-		this.index = index;
         this.mainLoop();
     }
 
