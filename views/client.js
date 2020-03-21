@@ -22,8 +22,8 @@ class Client{
             return;
         }
         this.invateCode = user.invateCode;
-        let clubId = Number(String(this.invateCode).substring(0, 3));
-        if (clubId != this.clubId) {
+        let tmpClubId = Number(String(this.invateCode).substring(0, 3));
+        if (tmpClubId != this.clubId) {
             console.log('俱乐部ID错误!');
             return;
         }
