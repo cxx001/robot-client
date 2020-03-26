@@ -160,7 +160,7 @@ class Game25{
 		}
 
 		this._stopLeaveSchedule();
-		let dt = 60 * 1000;
+		let dt = utils.randomInt(30 * 1000, 60 * 1000);
 		this.leaveSchedule = setTimeout(() => {
 			this.leaveSchedule = null;
 			this.pomelo.request('table.tableHandler.leaveRoom', {}, (data) => {})
@@ -176,7 +176,7 @@ class Game25{
 
 	_startGameSchedule() {
 		this._stopGameSchedule();
-		let dt = 10 * 1000;
+		let dt = utils.randomInt(5 * 1000, 7 * 1000);
 		this.startSchedule = setTimeout(() => {
 			this.startSchedule = null;
 			this.pomelo.request('table.tableHandler.handStartGame', {}, (data) => {
