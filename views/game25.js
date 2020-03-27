@@ -105,7 +105,7 @@ class Game25{
 		this.wBankerUser = data.wBankerUser;
 		if (this.wBankerUser != this.myChairID && !this.isHalfJoin()) {
 			// 闲家下注
-			await utils.sleep(utils.randomInt(1000, 3000));
+			await utils.sleep(utils.randomInt(2000, 4000));
 			let bBetting = this.getPullMultiple(this.stuCompareCard.cbValueType) + 1;
 			await this.pomelo.request('table.tableHandler.betting', {bBetting: bBetting}, (data) => {})
 		}
