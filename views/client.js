@@ -22,12 +22,6 @@ class Client{
             return;
         }
         this.invateCode = user.invateCode;
-        let tmpClubId = Number(String(this.invateCode).substring(0, 3));
-        if (tmpClubId != this.clubId) {
-            console.log('俱乐部ID错误!');
-            return;
-        }
-
         this.host = C_HOST;
         this.port = C_PORT;      
         this.code = openid;

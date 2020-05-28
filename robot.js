@@ -38,4 +38,4 @@ let run = async function(){
 run();
 
 
-// new Client('robot_2', 75135820, 2);
+// new Client('robot_1', 236, 1);
