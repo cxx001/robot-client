@@ -18,7 +18,7 @@
         "node-schedule": "^1.2.5",
         "ref-array": "^1.2.0",
         "stickpackage": "2.1.4",
-        "ws": "^6.1.2",
+        "ws": "^7.4.6",
         "pomelo-protobuf": "0.4.0",
         "pomelo-protocol": "0.1.6",
         "node-bignumber": "1.2.1",
